@@ -1,0 +1,3430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c12">
+<meta name="description" content="Философ на лавочке — медитативная экзистенциальная визуальная новелла о выгоревшем программисте, озере и людях, которые рядом.">
+<title>Философ на лавочке</title>
+<style>
+/* ============================================================
+   ПЕРЕМЕННЫЕ И БАЗА
+   ============================================================ */
+:root{
+  --ink:#f4eee5;
+  --muted:#c0b5a6;
+  --faint:rgba(244,238,229,.55);
+  --accent:#e8b271;
+  --accent-2:#9fc8c9;
+  --danger:#8fb0cf;
+  --line:rgba(255,255,255,.13);
+  --panel:rgba(9,11,17,.78);
+  --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,"Times New Roman",serif;
+  --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+
+  /* Закат по умолчанию */
+  --sky-1:#1d1030;
+  --sky-2:#5c2848;
+  --sky-3:#b85a45;
+  --sky-4:#e7a267;
+  --water-1:#4a2b3c;
+  --water-2:#120c16;
+  --cel-x:18%;
+  --cel-y:54%;
+  --cel-size:clamp(70px,10vw,130px);
+  --cel-color:#ffd7a0;
+  --cel-glow:rgba(255,150,90,.5);
+  --cel-opacity:1;
+  --stars-opacity:0;
+  --fog-opacity:0;
+  --rain-opacity:0;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:#0a0c12;
+  color:var(--ink);
+  font-family:var(--sans);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+[hidden]{display:none !important}
+button{font-family:inherit}
+::selection{background:rgba(232,178,113,.3)}
+
+.sr-only{
+  position:absolute!important;
+  width:1px;height:1px;
+  padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);
+  white-space:nowrap;border:0;
+}
+.sprite-defs{
+  position:absolute;
+  width:0;height:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+/* ============================================================
+   ФОНЫ-ДЕКОРАЦИИ (только CSS, без картинок)
+   ============================================================ */
+body[data-bg="sunset"]{
+  --sky-1:#1d1030; --sky-2:#5c2848; --sky-3:#b85a45; --sky-4:#e7a267;
+  --water-1:#4a2b3c; --water-2:#120c16;
+  --cel-x:18%; --cel-y:54%; --cel-size:clamp(70px,10vw,130px);
+  --cel-color:#ffd7a0; --cel-glow:rgba(255,150,90,.5); --cel-opacity:1;
+  --stars-opacity:0; --fog-opacity:0; --rain-opacity:0;
+}
+body[data-bg="night"]{
+  --sky-1:#03050c; --sky-2:#071022; --sky-3:#0d1b31; --sky-4:#152943;
+  --water-1:#0a1523; --water-2:#02050a;
+  --cel-x:74%; --cel-y:16%; --cel-size:clamp(46px,6vw,80px);
+  --cel-color:#e6edff; --cel-glow:rgba(170,200,255,.25); --cel-opacity:1;
+  --stars-opacity:1; --fog-opacity:.1; --rain-opacity:0;
+}
+body[data-bg="dawn"]{
+  --sky-1:#170f2c; --sky-2:#4a2a52; --sky-3:#b06a6d; --sky-4:#f0c08c;
+  --water-1:#5a3a48; --water-2:#180f1a;
+  --cel-x:24%; --cel-y:52%; --cel-size:clamp(60px,8vw,110px);
+  --cel-color:#ffe0b3; --cel-glow:rgba(255,190,140,.38); --cel-opacity:1;
+  --stars-opacity:.25; --fog-opacity:.25; --rain-opacity:0;
+}
+body[data-bg="rain"]{
+  --sky-1:#161d25; --sky-2:#25313c; --sky-3:#3e4c57; --sky-4:#616f78;
+  --water-1:#2b353d; --water-2:#0b0f13;
+  --cel-x:20%; --cel-y:20%; --cel-size:clamp(60px,8vw,100px);
+  --cel-color:#aab8c2; --cel-glow:rgba(160,180,200,.12); --cel-opacity:.22;
+  --stars-opacity:0; --fog-opacity:.2; --rain-opacity:1;
+}
+body[data-bg="fog"]{
+  --sky-1:#222a31; --sky-2:#39444d; --sky-3:#5f6d75; --sky-4:#8c989e;
+  --water-1:#4b575e; --water-2:#171c20;
+  --cel-x:50%; --cel-y:20%; --cel-size:clamp(90px,12vw,150px);
+  --cel-color:#d9e1e4; --cel-glow:rgba(220,230,235,.18); --cel-opacity:.4;
+  --stars-opacity:0; --fog-opacity:1; --rain-opacity:0;
+}
+
+.world{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  background:#0a0c12;
+  pointer-events:none;
+}
+.sky{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,var(--sky-1) 0%,var(--sky-2) 42%,var(--sky-3) 72%,var(--sky-4) 100%);
+}
+.celestial{
+  position:absolute;
+  left:var(--cel-x);
+  top:var(--cel-y);
+  width:var(--cel-size);
+  aspect-ratio:1;
+  border-radius:50%;
+  background:var(--cel-color);
+  box-shadow:0 0 90px 32px var(--cel-glow);
+  opacity:var(--cel-opacity);
+  transform:translate(-50%,-50%);
+  transition:opacity 1.2s ease;
+}
+.stars{
+  position:absolute;
+  inset:0;
+  opacity:var(--stars-opacity);
+  transition:opacity 1.2s ease;
+}
+.star{
+  position:absolute;
+  display:block;
+  border-radius:50%;
+  background:#fff;
+  opacity:.6;
+  animation:twinkle var(--dur,3s) ease-in-out infinite alternate;
+  animation-delay:var(--delay,0s);
+}
+@keyframes twinkle{
+  from{opacity:.12;transform:scale(.8)}
+  to{opacity:.85;transform:scale(1)}
+}
+.fog{
+  position:absolute;
+  inset:0;
+  opacity:var(--fog-opacity);
+  transition:opacity 1.4s ease;
+  filter:blur(2px);
+}
+.fog span{
+  position:absolute;
+  display:block;
+  width:72vw;
+  height:34vh;
+  border-radius:50%;
+  background:rgba(224,234,238,.13);
+  filter:blur(46px);
+  animation:fogdrift 26s ease-in-out infinite alternate;
+}
+.fog span:nth-child(1){left:-12%;top:48%;animation-duration:29s}
+.fog span:nth-child(2){right:-16%;top:24%;width:60vw;height:26vh;animation-duration:23s;animation-delay:-7s;background:rgba(230,238,241,.1)}
+.fog span:nth-child(3){left:18%;bottom:6%;width:88vw;height:22vh;animation-duration:33s;animation-delay:-12s}
+@keyframes fogdrift{
+  from{transform:translate3d(-2%,0,0) scale(1)}
+  to{transform:translate3d(3%,-2%,0) scale(1.08)}
+}
+.rain{
+  position:absolute;
+  inset:-18% 0 0;
+  opacity:var(--rain-opacity);
+  transition:opacity 1.2s ease;
+}
+.rain::before,
+.rain::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:repeating-linear-gradient(100deg,transparent 0 9px,rgba(208,224,234,.22) 9px 10px,transparent 10px 23px);
+  animation:rainfall .65s linear infinite;
+}
+.rain::after{
+  opacity:.45;
+  animation-duration:1.05s;
+  transform:translateX(14px);
+}
+@keyframes rainfall{
+  from{transform:translate3d(0,-8%,0)}
+  to{transform:translate3d(-5%,9%,0)}
+}
+.water{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:34%;
+  background:linear-gradient(180deg,var(--water-1) 0%,var(--water-2) 100%);
+  overflow:hidden;
+}
+.water::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(180deg,transparent 0 13px,rgba(255,255,255,.055) 14px,transparent 15px 29px);
+  animation:waterdrift 16s linear infinite;
+  opacity:.75;
+}
+.water::after{
+  content:"";
+  position:absolute;
+  left:24%;right:12%;top:7%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cel-glow),transparent);
+  filter:blur(2px);
+  opacity:.6;
+  animation:shimmer 8s ease-in-out infinite alternate;
+}
+@keyframes waterdrift{
+  from{transform:translateY(0)}
+  to{transform:translateY(29px)}
+}
+@keyframes shimmer{
+  from{opacity:.25;transform:translateX(-2%) scaleX(.8)}
+  to{opacity:.75;transform:translateX(2%) scaleX(1.1)}
+}
+.grain{
+  position:absolute;
+  inset:0;
+  opacity:.055;
+  background-image:radial-gradient(rgba(255,255,255,.7) .5px,transparent .5px);
+  background-size:3px 3px;
+  mix-blend-mode:overlay;
+}
+.vignette{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(120% 85% at 50% 18%,transparent 42%,rgba(0,0,0,.62) 100%);
+}
+
+/* Лавочка и силуэт */
+.bench{
+  position:absolute;
+  right:clamp(10px,7vw,140px);
+  bottom:calc(34% - 2px);
+  width:clamp(168px,21vw,292px);
+  aspect-ratio:2.7/1;
+  z-index:2;
+  opacity:.94;
+  filter:drop-shadow(0 20px 26px rgba(0,0,0,.4));
+}
+.bench .back{
+  position:absolute;
+  left:6%;right:12%;bottom:46%;
+  height:31%;
+  border-radius:8px 8px 3px 3px;
+  background:#08070c;
+}
+.bench .back::after{
+  content:"";
+  position:absolute;
+  inset:20% 8%;
+  background:repeating-linear-gradient(180deg,transparent 0 6px,rgba(255,255,255,.055) 6px 8px);
+}
+.bench .seat{
+  position:absolute;
+  left:2%;right:8%;bottom:34%;
+  height:9%;
+  border-radius:4px;
+  background:#0a090e;
+}
+.bench .leg{
+  position:absolute;
+  bottom:0;
+  width:5%;
+  height:38%;
+  background:#07060a;
+}
+.bench .leg.l{left:10%}
+.bench .leg.r{right:18%}
+.bench .figure{
+  position:absolute;
+  right:19%;
+  bottom:43%;
+  width:21%;
+  height:47%;
+}
+.bench .figure .head{
+  position:absolute;
+  left:50%;top:0;
+  width:38%;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:#08070c;
+  transform:translateX(-50%);
+}
+.bench .figure .body{
+  position:absolute;
+  left:50%;bottom:0;
+  width:76%;height:70%;
+  border-radius:44% 44% 10% 10%;
+  background:#08070c;
+  transform:translateX(-50%);
+}
+
+/* Удочка у воды — появляется в сценах с рыбалкой */
+.rod{
+  position:absolute;
+  right:clamp(14px,15vw,230px);
+  bottom:calc(34% - 8px);
+  width:clamp(136px,17vw,230px);
+  z-index:3;
+  opacity:0;
+  transform:translateY(10px) rotate(-1.5deg);
+  transform-origin:50% 100%;
+  transition:opacity .7s ease,transform .7s ease;
+  pointer-events:none;
+  filter:drop-shadow(0 14px 18px rgba(0,0,0,.35));
+}
+body.rod-out .rod{
+  opacity:.96;
+  transform:translateY(0) rotate(0deg);
+}
+.rod svg{display:block;width:100%;height:auto;overflow:visible}
+.rod .float{
+  transform-origin:200px 188px;
+  animation:bob 4.2s ease-in-out infinite;
+}
+@keyframes bob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(3px)}
+}
+
+/* ============================================================
+   ИНТЕРФЕЙС
+   ============================================================ */
+.app{
+  position:relative;
+  z-index:2;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+}
+.hud{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.8rem;
+  padding:clamp(.7rem,2.2vw,1.25rem) clamp(.85rem,3vw,1.8rem);
+}
+.brand{
+  display:flex;
+  flex-direction:column;
+  gap:.25rem;
+  min-width:0;
+}
+.brand-mark{
+  font-family:var(--serif);
+  font-size:clamp(.78rem,2.1vw,.95rem);
+  letter-spacing:.17em;
+  text-transform:uppercase;
+  color:var(--muted);
+  white-space:nowrap;
+}
+.dayline{
+  font-size:.74rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--faint);
+}
+.controls{
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.ghost{
+  appearance:none;
+  border:1px solid var(--line);
+  background:rgba(8,10,14,.42);
+  color:var(--ink);
+  font-size:.78rem;
+  letter-spacing:.02em;
+  padding:.5rem .78rem;
+  border-radius:999px;
+  cursor:pointer;
+  min-height:38px;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+.ghost:hover{
+  background:rgba(232,178,113,.14);
+  border-color:rgba(232,178,113,.45);
+}
+.ghost:active{transform:translateY(1px)}
+.ghost:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ghost.is-armed{
+  border-color:rgba(232,178,113,.75);
+  background:rgba(232,178,113,.2);
+}
+.ghost .short{display:none}
+.ghost.is-active{
+  border-color:rgba(232,178,113,.6);
+  background:rgba(232,178,113,.16);
+}
+
+.screen{
+  flex:1;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0 clamp(.7rem,2.6vw,1.8rem) max(.9rem,env(safe-area-inset-bottom));
+  min-height:0;
+}
+.panel{
+  position:relative;
+  width:min(880px,100%);
+  max-height:calc(100dvh - 7.4rem);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  background:linear-gradient(180deg,rgba(13,16,24,.84),rgba(7,9,14,.92));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(16px) saturate(120%);
+  -webkit-backdrop-filter:blur(16px) saturate(120%);
+  padding:clamp(.95rem,2.6vw,1.55rem) clamp(.95rem,3vw,1.7rem);
+  transition:opacity .22s ease,transform .22s ease;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.18) transparent;
+}
+.panel::-webkit-scrollbar{width:6px}
+.panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:99px}
+.panel.is-leaving{
+  opacity:0;
+  transform:translateY(12px);
+}
+.panel::before{
+  content:"";
+  position:absolute;
+  left:8%;right:8%;top:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+}
+.scene-meta{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  min-height:1.6rem;
+  margin-bottom:.65rem;
+}
+.portrait{
+  flex:none;
+  width:68px;height:68px;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(232,178,113,.34);
+  background:#0d1218;
+  box-shadow:0 10px 24px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.05);
+  animation:portrait-in .35s ease both;
+}
+.portrait svg{display:block;width:100%;height:100%}
+@keyframes portrait-in{
+  from{opacity:0;transform:translateY(4px) scale(.97)}
+  to{opacity:1;transform:none}
+}
+.speaker-block{
+  display:flex;
+  flex-direction:column;
+  gap:.18rem;
+  min-width:0;
+}
+.speaker{
+  font-family:var(--serif);
+  font-size:clamp(1rem,3.2vw,1.22rem);
+  color:var(--accent);
+  letter-spacing:.02em;
+  line-height:1.15;
+}
+.speaker-role{
+  font-size:.62rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--faint);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.scene-no{
+  margin-left:auto;
+  align-self:flex-start;
+  padding-top:.15rem;
+  font-size:.68rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--faint);
+}
+.text{
+  margin:0;
+  font-family:var(--serif);
+  font-size:clamp(1.02rem,2.6vw,1.17rem);
+  line-height:1.64;
+  white-space:pre-line;
+  min-height:5.2em;
+  color:var(--ink);
+}
+.text.is-typing::after{
+  content:"▌";
+  margin-left:.12em;
+  color:var(--accent);
+  opacity:.65;
+  animation:blink 1s steps(1) infinite;
+}
+@keyframes blink{
+  50%{opacity:0}
+}
+.cast{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem;
+  margin-top:1rem;
+}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  padding:.28rem .58rem;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.045);
+  color:var(--muted);
+  font-size:.76rem;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.chip .who{color:var(--ink);opacity:.88}
+.chip-avatar{
+  flex:none;
+  display:block;
+  width:18px;height:18px;
+  border-radius:50%;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.14);
+  background:#10161e;
+}
+.chip-avatar svg{display:block;width:100%;height:100%}
+.pips{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+}
+.pip{
+  display:block;
+  width:5px;height:5px;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+}
+.pip.on{
+  background:var(--accent);
+  box-shadow:0 0 6px rgba(232,178,113,.7);
+}
+.pip.on.neg{
+  background:var(--danger);
+  box-shadow:0 0 6px rgba(143,176,207,.7);
+}
+
+.choices{
+  display:grid;
+  gap:.5rem;
+  margin-top:1.05rem;
+  transition:opacity .25s ease,visibility .25s;
+}
+.choices.is-hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.choice{
+  display:flex;
+  align-items:flex-start;
+  gap:.7rem;
+  width:100%;
+  min-height:48px;
+  padding:.78rem .85rem;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);
+  color:var(--ink);
+  font-size:clamp(.93rem,2.45vw,1rem);
+  line-height:1.36;
+  text-align:left;
+  cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.choice:hover{
+  background:rgba(232,178,113,.11);
+  border-color:rgba(232,178,113,.42);
+  transform:translateY(-1px);
+}
+.choice:active{transform:translateY(0)}
+.choice:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.choice .num{
+  flex:none;
+  display:grid;
+  place-items:center;
+  width:1.45rem;height:1.45rem;
+  margin-top:-1px;
+  border-radius:50%;
+  border:1px solid rgba(232,178,113,.35);
+  color:var(--accent);
+  font-size:.75rem;
+  font-variant-numeric:tabular-nums;
+}
+.choice .label{flex:1}
+.choice.is-final{
+  border-color:rgba(232,178,113,.28);
+}
+.choice.is-final .num{
+  border-color:rgba(232,178,113,.6);
+  background:rgba(232,178,113,.1);
+}
+
+/* Экран финала */
+.ending-head{
+  margin:.15rem 0 .75rem;
+}
+.kicker{
+  display:inline-block;
+  font-size:.66rem;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--accent);
+  opacity:.85;
+  margin-bottom:.35rem;
+}
+.ending-title{
+  margin:0;
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(1.55rem,5.6vw,2.5rem);
+  line-height:1.08;
+  letter-spacing:.01em;
+}
+.ending-foot{
+  margin-top:1.2rem;
+  padding-top:1rem;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.unlocked{
+  font-size:.74rem;
+  letter-spacing:.08em;
+  color:var(--faint);
+  margin-bottom:.75rem;
+}
+.ending-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.55rem;
+}
+.primary{
+  appearance:none;
+  border:0;
+  border-radius:999px;
+  background:linear-gradient(180deg,#f0c489,#d99a55);
+  color:#1b1208;
+  font-size:.85rem;
+  font-weight:600;
+  letter-spacing:.03em;
+  padding:.7rem 1.15rem;
+  min-height:44px;
+  cursor:pointer;
+  transition:filter .2s ease,transform .2s ease;
+}
+.primary:hover{filter:brightness(1.06)}
+.primary:active{transform:translateY(1px)}
+.primary:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* Галерея персонажей */
+.gallery{
+  position:fixed;
+  inset:0;
+  z-index:30;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(.7rem,3vw,2rem);
+}
+.gallery-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(3,5,9,.72);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.gallery-panel{
+  position:relative;
+  width:min(960px,100%);
+  max-height:min(86dvh,900px);
+  display:flex;
+  flex-direction:column;
+  gap:.9rem;
+  padding:clamp(1rem,2.8vw,1.6rem);
+  border-radius:24px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(16,20,29,.97),rgba(7,9,14,.98));
+  box-shadow:0 40px 110px rgba(0,0,0,.65);
+  overflow:hidden;
+}
+.gallery-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+}
+.gallery-title{
+  margin:0;
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(1.3rem,4vw,1.8rem);
+  line-height:1.1;
+}
+.gallery-sub{
+  margin-top:.3rem;
+  font-size:.74rem;
+  letter-spacing:.06em;
+  color:var(--faint);
+}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.65rem;
+  overflow-y:auto;
+  padding-right:.2rem;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.18) transparent;
+}
+.gallery-grid::-webkit-scrollbar{width:6px}
+.gallery-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:99px}
+.person-card{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  padding:.65rem;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.035);
+  min-width:0;
+}
+.person-portrait{
+  flex:none;
+  width:70px;height:70px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(232,178,113,.25);
+  background:#0d1218;
+}
+.person-portrait svg{display:block;width:100%;height:100%}
+.person-copy{min-width:0}
+.person-name{
+  margin:0;
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:.98rem;
+  color:var(--ink);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.person-role{
+  margin:.16rem 0 .3rem;
+  font-size:.7rem;
+  line-height:1.3;
+  color:var(--muted);
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.person-card.is-locked{
+  opacity:.62;
+}
+.person-card.is-locked .person-portrait{
+  filter:grayscale(1) brightness(.3) blur(1.5px);
+}
+.person-card.is-locked .person-name{color:var(--muted)}
+.person-card.is-locked .pips{visibility:hidden}
+
+/* Сохранения */
+.saves{
+  position:fixed;
+  inset:0;
+  z-index:31;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(.7rem,3vw,2rem);
+}
+.saves-panel{
+  position:relative;
+  width:min(760px,100%);
+  max-height:min(86dvh,820px);
+  display:flex;
+  flex-direction:column;
+  gap:.9rem;
+  padding:clamp(1rem,2.8vw,1.6rem);
+  border-radius:24px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(16,20,29,.97),rgba(7,9,14,.98));
+  box-shadow:0 40px 110px rgba(0,0,0,.65);
+  overflow:hidden;
+}
+.saves-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+}
+.saves-title{
+  margin:0;
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(1.3rem,4vw,1.8rem);
+  line-height:1.1;
+}
+.saves-sub{
+  margin-top:.3rem;
+  font-size:.74rem;
+  line-height:1.4;
+  color:var(--faint);
+}
+.saves-list{
+  display:grid;
+  gap:.6rem;
+  overflow-y:auto;
+  padding-right:.2rem;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.18) transparent;
+}
+.saves-list::-webkit-scrollbar{width:6px}
+.saves-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:99px}
+.save-card{
+  padding:.8rem .85rem;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.035);
+}
+.save-card.is-empty{
+  border-style:dashed;
+  opacity:.8;
+}
+.save-top{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:.5rem;
+  margin-bottom:.35rem;
+}
+.save-slot{
+  font-size:.66rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+.save-time{
+  font-size:.68rem;
+  color:var(--faint);
+  white-space:nowrap;
+}
+.save-scene{
+  margin:0;
+  font-family:var(--serif);
+  font-size:1rem;
+  line-height:1.3;
+}
+.save-meta{
+  margin-top:.2rem;
+  font-size:.72rem;
+  color:var(--muted);
+}
+.save-snippet{
+  margin:.4rem 0 0;
+  font-size:.7rem;
+  line-height:1.4;
+  color:var(--faint);
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.save-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem;
+  margin-top:.6rem;
+}
+.primary.small{
+  padding:.45rem .8rem;
+  min-height:36px;
+  font-size:.75rem;
+}
+.ghost.small{
+  padding:.4rem .65rem;
+  min-height:36px;
+  font-size:.72rem;
+}
+.ghost.danger{
+  color:#e6b3a6;
+  border-color:rgba(200,120,100,.25);
+}
+.ghost.danger:hover{
+  background:rgba(180,90,70,.16);
+  border-color:rgba(200,120,100,.55);
+}
+.save-hint{
+  margin:0;
+  font-size:.7rem;
+  line-height:1.45;
+  color:var(--faint);
+}
+
+/* Тост */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:max(1rem,env(safe-area-inset-bottom));
+  transform:translate(-50%,12px);
+  z-index:40;
+  max-width:min(92vw,560px);
+  padding:.6rem 1rem;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(10,13,20,.94);
+  color:var(--ink);
+  font-size:.8rem;
+  line-height:1.3;
+  text-align:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease,transform .25s ease;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.toast.is-visible{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width:640px){
+  .brand-mark{font-size:.72rem;letter-spacing:.12em}
+  .dayline{font-size:.66rem}
+  .ghost{font-size:.72rem;padding:.44rem .62rem;min-height:36px}
+  .panel{max-height:calc(100dvh - 6.6rem);border-radius:18px}
+  .bench{right:4%;bottom:calc(34% - 2px);width:46vw;opacity:.55}
+  .rod{right:5%;width:38vw;bottom:calc(34% - 2px);opacity:0}
+  body.rod-out .rod{opacity:.62}
+  .vignette{background:radial-gradient(130% 80% at 50% 12%,transparent 38%,rgba(0,0,0,.66) 100%)}
+  .text{min-height:4.4em}
+  .portrait{width:58px;height:58px;border-radius:15px}
+  .speaker-role{font-size:.58rem;letter-spacing:.12em}
+  .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .person-portrait{width:62px;height:62px}
+}
+@media (max-width:560px){
+  .ghost .long{display:none}
+  .ghost .short{display:inline}
+  .gallery-grid{grid-template-columns:1fr}
+  .gallery-panel{max-height:88dvh}
+}
+@media (max-width:420px){
+  .hud{gap:.5rem;padding-top:.6rem}
+  .brand-mark{display:none}
+  .dayline{font-size:.68rem;letter-spacing:.14em}
+  .controls{gap:.3rem}
+  .screen{padding-left:.5rem;padding-right:.5rem}
+  .panel{padding:.9rem .85rem;max-height:calc(100dvh - 5.9rem)}
+  .choice{font-size:.92rem;padding:.72rem .75rem;min-height:46px}
+  .chip{font-size:.7rem}
+  .portrait{width:52px;height:52px;border-radius:13px}
+  .scene-meta{gap:.55rem}
+  .person-card{padding:.55rem}
+  .person-portrait{width:58px;height:58px}
+}
+@media (max-height:520px) and (orientation:landscape){
+  .hud{padding-top:.4rem;padding-bottom:.4rem}
+  .panel{max-height:calc(100dvh - 5rem)}
+  .text{min-height:3.1em;font-size:1rem}
+  .bench{display:none}
+  .cast{margin-top:.6rem}
+  .choices{margin-top:.7rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
+</head>
+<body data-bg="sunset">
+
+<!-- Портреты персонажей: встроенный SVG, без внешних файлов -->
+<svg class="sprite-defs" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="p-narrator" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#0c1219"/>
+    <circle cx="82" cy="34" r="15" fill="#e8b271" opacity=".8"/>
+    <path d="M0 88 Q60 80 120 88 V120 H0Z" fill="#142130"/>
+    <path d="M0 97 Q60 89 120 97 V120 H0Z" fill="#0b141f"/>
+    <rect x="32" y="72" width="58" height="6" rx="2" fill="#05080d"/>
+    <rect x="36" y="78" width="4" height="20" fill="#05080d"/>
+    <rect x="82" y="78" width="4" height="20" fill="#05080d"/>
+    <path d="M32 72 V62 M90 72 V62" stroke="#05080d" stroke-width="4"/>
+    <circle cx="88" cy="30" r="2" fill="#fff" opacity=".75"/>
+  </symbol>
+  <symbol id="p-oldman" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#151b22"/>
+    <path d="M16 120 C18 94 38 84 60 84 C82 84 102 94 104 120Z" fill="#3d4a55"/>
+    <circle cx="60" cy="52" r="21" fill="#d5a982"/>
+    <path d="M39 48 C39 30 49 24 60 24 C72 24 81 32 81 48Z" fill="#2b2a2b"/>
+    <path d="M35 47 Q60 40 86 47 L84 53 Q60 46 37 53Z" fill="#1f1e20"/>
+    <path d="M45 62 Q60 58 75 62 Q74 82 60 84 Q46 82 45 62Z" fill="#d8d2c6"/>
+    <circle cx="53" cy="51" r="1.7" fill="#1d1a18"/>
+    <circle cx="67" cy="51" r="1.7" fill="#1d1a18"/>
+    <path d="M52 69 Q60 73 68 69" stroke="#8a6a55" stroke-width="2" fill="none"/>
+    <path d="M48 88 L60 96 L72 88" stroke="#8a5f4a" stroke-width="5" fill="none"/>
+  </symbol>
+  <symbol id="p-girl" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#1a2430"/>
+    <path d="M16 120 C18 96 36 86 60 86 C84 86 102 96 104 120Z" fill="#3b4b58"/>
+    <circle cx="60" cy="48" r="20" fill="#d9ae88"/>
+    <path d="M38 50 C36 26 48 20 62 20 C78 20 84 32 82 52 C76 42 68 38 60 38 C50 38 42 42 38 50Z" fill="#2a2320"/>
+    <path d="M39 50 C37 60 38 66 42 71 L40 53Z" fill="#2a2320"/>
+    <circle cx="53" cy="50" r="1.6" fill="#1d1a18"/>
+    <circle cx="67" cy="50" r="1.6" fill="#1d1a18"/>
+    <path d="M54 60 Q60 64 66 60" stroke="#9a5f4c" stroke-width="2" fill="none"/>
+    <path d="M46 88 L38 78 M74 88 L86 74" stroke="#e8b271" stroke-width="2"/>
+    <rect x="46" y="87" width="28" height="18" rx="4" fill="#1c222a" stroke="#8b969e" stroke-width="2"/>
+    <circle cx="60" cy="96" r="7" fill="#11161c" stroke="#e8b271" stroke-width="1.5"/>
+    <circle cx="60" cy="96" r="3" fill="#9fc8c9"/>
+  </symbol>
+  <symbol id="p-boy" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#22303a"/>
+    <path d="M20 120 C22 98 38 88 60 88 C82 88 98 98 100 120Z" fill="#b55f46"/>
+    <circle cx="60" cy="52" r="19" fill="#dcb18c"/>
+    <path d="M42 49 C42 32 52 27 62 27 C73 27 79 36 78 49 C70 42 64 40 58 42 C50 44 45 46 42 49Z" fill="#3a2c24"/>
+    <circle cx="53" cy="51" r="1.6" fill="#1d1a18"/>
+    <circle cx="67" cy="51" r="1.6" fill="#1d1a18"/>
+    <path d="M54 61 Q60 65 66 61" stroke="#8a5a48" stroke-width="2" fill="none"/>
+    <path d="M40 110 L60 94 L80 110 Z" fill="#e9e2d5"/>
+    <path d="M44 110 L76 110 L72 116 L48 116 Z" fill="#d8cdbd"/>
+    <path d="M60 94 V110" stroke="#9a8f7f" stroke-width="1.5"/>
+  </symbol>
+  <symbol id="p-suit" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#121820"/>
+    <path d="M14 120 L26 88 L46 82 L60 90 L74 82 L94 88 L106 120Z" fill="#242b34"/>
+    <path d="M50 86 L60 100 L70 86 L60 82Z" fill="#d8d5cf"/>
+    <path d="M57 90 L63 90 L62 112 L60 116 L58 112Z" fill="#a64b3c"/>
+    <circle cx="60" cy="52" r="21" fill="#d7ab84"/>
+    <path d="M38 48 C38 28 48 22 60 22 C74 22 82 30 82 48 C76 40 68 36 58 38 C48 40 42 44 38 48Z" fill="#1c1b1e"/>
+    <circle cx="52" cy="52" r="1.7" fill="#1d1a18"/>
+    <circle cx="68" cy="52" r="1.7" fill="#1d1a18"/>
+    <path d="M54 64 H66" stroke="#8a5a48" stroke-width="2"/>
+    <path d="M44 86 L60 94 L76 86" stroke="#8e6a4f" stroke-width="2" fill="none"/>
+  </symbol>
+  <symbol id="p-lake" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#081521"/>
+    <circle cx="60" cy="58" r="38" fill="#0e2634"/>
+    <circle cx="60" cy="58" r="28" fill="none" stroke="#3f7c84" stroke-opacity=".5"/>
+    <circle cx="60" cy="58" r="18" fill="none" stroke="#6fa7a9" stroke-opacity=".55"/>
+    <ellipse cx="60" cy="58" rx="14" ry="17" fill="#9fc8c9" opacity=".22"/>
+    <circle cx="54" cy="55" r="2.4" fill="#dff3f2"/>
+    <circle cx="66" cy="55" r="2.4" fill="#dff3f2"/>
+    <path d="M54 67 Q60 71 66 67" stroke="#dff3f2" stroke-width="1.5" fill="none" opacity=".7"/>
+    <path d="M0 92 Q20 84 40 92 T80 92 T120 92 V120 H0Z" fill="#12303e" opacity=".8"/>
+    <path d="M18 30 q4 -8 8 0" stroke="#9fc8c9" opacity=".4" fill="none"/>
+    <path d="M88 26 q4 -8 8 0" stroke="#9fc8c9" opacity=".25" fill="none"/>
+  </symbol>
+  <symbol id="p-under" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#08080c"/>
+    <rect x="10" y="26" width="100" height="12" rx="3" fill="#2a211c"/>
+    <rect x="10" y="38" width="100" height="5" fill="#17120f"/>
+    <path d="M0 44 H120 V120 H0Z" fill="#050507"/>
+    <path d="M30 44 C40 60 44 70 42 92" stroke="#1c1a1e" stroke-width="10" fill="none"/>
+    <circle cx="62" cy="68" r="9" fill="#e8b271" opacity=".15"/>
+    <circle cx="62" cy="68" r="4" fill="#e8b271" opacity=".9"/>
+    <path d="M78 92 Q82 82 88 92" stroke="#5b4a3c" stroke-width="2" fill="none"/>
+    <circle cx="58" cy="94" r="2" fill="#6b5a4a"/>
+    <circle cx="66" cy="96" r="2" fill="#6b5a4a"/>
+    <circle cx="74" cy="93" r="2" fill="#6b5a4a"/>
+  </symbol>
+  <symbol id="p-god" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#24241f"/>
+    <circle cx="60" cy="46" r="29" fill="none" stroke="#e8b271" stroke-width="2" stroke-dasharray="4 7" opacity=".55"/>
+    <path d="M14 120 C18 94 38 84 60 84 C82 84 102 94 106 120Z" fill="#5a4b3a"/>
+    <path d="M46 86 L60 110 L74 86" fill="#3f3429"/>
+    <circle cx="60" cy="54" r="20" fill="#cfa47f"/>
+    <path d="M40 52 C40 34 48 28 60 28 C72 28 80 34 80 52 C74 44 68 42 60 42 C52 42 46 44 40 52Z" fill="#4a4036"/>
+    <circle cx="53" cy="54" r="1.7" fill="#1d1a18"/>
+    <circle cx="67" cy="54" r="1.7" fill="#1d1a18"/>
+    <path d="M53 67 Q60 65 67 67" stroke="#8a6a55" stroke-width="1.8" fill="none"/>
+    <rect x="82" y="94" width="11" height="14" rx="2" fill="#d8d2c6" opacity=".9"/>
+  </symbol>
+  <symbol id="p-inner" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#171222"/>
+    <path d="M20 120 C22 96 38 88 60 88 C82 88 98 96 100 120Z" fill="#2b2a3d"/>
+    <circle cx="54" cy="50" r="20" fill="#b9a6a0" opacity=".75"/>
+    <circle cx="66" cy="50" r="20" fill="#d8b191" opacity=".7"/>
+    <path d="M34 48 C34 30 44 24 54 24 C66 24 74 32 74 48 C68 40 62 37 54 38 C45 39 39 43 34 48Z" fill="#241d2b"/>
+    <circle cx="49" cy="52" r="1.6" fill="#14111a"/>
+    <circle cx="61" cy="52" r="1.6" fill="#14111a"/>
+    <rect x="28" y="60" width="64" height="3" fill="#9fc8c9" opacity=".4"/>
+    <rect x="34" y="68" width="52" height="2" fill="#e8b271" opacity=".4"/>
+    <rect x="40" y="76" width="40" height="2" fill="#9fc8c9" opacity=".3"/>
+  </symbol>
+  <symbol id="p-fisher" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#15222a"/>
+    <path d="M16 120 C18 96 38 86 60 86 C82 86 102 96 104 120Z" fill="#3f5058"/>
+    <circle cx="60" cy="54" r="20" fill="#c99a73"/>
+    <path d="M44 62 Q60 58 76 62 Q74 82 60 84 Q46 82 44 62Z" fill="#cfc6b8"/>
+    <path d="M30 46 Q60 38 90 46 L94 52 Q60 44 26 52Z" fill="#2c3136"/>
+    <path d="M42 46 C42 30 50 26 60 26 C70 26 78 32 78 46Z" fill="#343b40"/>
+    <circle cx="53" cy="52" r="1.7" fill="#1d1a18"/>
+    <circle cx="67" cy="52" r="1.7" fill="#1d1a18"/>
+    <path d="M54 72 H66" stroke="#8a6a55" stroke-width="2"/>
+    <path d="M82 96 L112 26" stroke="#a8794c" stroke-width="3"/>
+    <path d="M112 26 C118 60 116 84 112 106" stroke="#d8e2e6" stroke-width="1" fill="none" opacity=".7"/>
+    <circle cx="112" cy="108" r="3" fill="#e8b271"/>
+    <path d="M66 74 L82 76" stroke="#4a3a2c" stroke-width="3"/>
+  </symbol>
+  <symbol id="p-dog" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#282317"/>
+    <path d="M30 46 L22 20 L44 34Z" fill="#6b4a2f"/>
+    <path d="M90 46 L98 20 L76 34Z" fill="#6b4a2f"/>
+    <circle cx="60" cy="58" r="30" fill="#a97445"/>
+    <ellipse cx="60" cy="72" rx="18" ry="14" fill="#c99a6b"/>
+    <circle cx="51" cy="54" r="2.4" fill="#14100c"/>
+    <circle cx="69" cy="54" r="2.4" fill="#14100c"/>
+    <ellipse cx="60" cy="66" rx="5" ry="3.6" fill="#14100c"/>
+    <path d="M60 70 V76 M60 76 Q54 82 50 76 M60 76 Q66 82 70 76" stroke="#14100c" stroke-width="1.6" fill="none"/>
+    <path d="M56 82 Q60 92 64 82" fill="#b05a56"/>
+    <rect x="36" y="96" width="48" height="8" rx="4" fill="#7a3f3a"/>
+    <circle cx="60" cy="100" r="3" fill="#e8b271"/>
+  </symbol>
+  <symbol id="p-keeper" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#25291f"/>
+    <path d="M16 120 C18 96 38 86 60 86 C82 86 102 96 104 120Z" fill="#4a5444"/>
+    <circle cx="60" cy="52" r="20" fill="#d3a883"/>
+    <path d="M38 42 Q60 30 82 42 L84 56 Q60 46 36 56Z" fill="#a64b3c"/>
+    <circle cx="52" cy="52" r="6" fill="none" stroke="#d8d2c6" stroke-width="1.5"/>
+    <circle cx="68" cy="52" r="6" fill="none" stroke="#d8d2c6" stroke-width="1.5"/>
+    <path d="M58 52 H62" stroke="#d8d2c6" stroke-width="1.5"/>
+    <circle cx="52" cy="52" r="1.5" fill="#1d1a18"/>
+    <circle cx="68" cy="52" r="1.5" fill="#1d1a18"/>
+    <path d="M54 66 Q60 69 66 66" stroke="#8a5a48" stroke-width="2" fill="none"/>
+    <path d="M86 120 L96 78" stroke="#8a6a45" stroke-width="4"/>
+    <path d="M90 78 L110 92 L104 100 L84 86Z" fill="#c2a15e"/>
+  </symbol>
+  <symbol id="p-courier" viewBox="0 0 120 120">
+    <rect width="120" height="120" fill="#1b2430"/>
+    <path d="M16 120 C18 98 38 88 60 88 C82 88 102 98 104 120Z" fill="#3f5a6a"/>
+    <rect x="30" y="88" width="60" height="30" rx="3" fill="#b98a58"/>
+    <path d="M57 88 V118" stroke="#e8d3b0" stroke-width="4"/>
+    <circle cx="60" cy="52" r="19" fill="#d8ad86"/>
+    <path d="M40 46 C40 30 50 24 60 24 C72 24 80 30 80 46Z" fill="#2d4a5a"/>
+    <path d="M38 46 Q60 40 84 46 L82 51 Q60 46 38 51Z" fill="#223b48"/>
+    <circle cx="53" cy="52" r="1.6" fill="#1d1a18"/>
+    <circle cx="67" cy="52" r="1.6" fill="#1d1a18"/>
+    <path d="M54 62 Q60 66 66 62" stroke="#8a5a48" stroke-width="2" fill="none"/>
+    <path d="M42 88 L52 70" stroke="#25414f" stroke-width="4"/>
+    <circle cx="72" cy="58" r="3" fill="#d8d2c6" opacity=".9"/>
+  </symbol>
+</svg>
+
+<!-- Фоновая сцена -->
+<div class="world" aria-hidden="true">
+  <div class="sky"></div>
+  <div class="stars" id="stars"></div>
+  <div class="celestial"></div>
+  <div class="fog"><span></span><span></span><span></span></div>
+  <div class="rain"></div>
+  <div class="water"></div>
+  <div class="bench">
+    <div class="back"></div>
+    <div class="seat"></div>
+    <div class="leg l"></div>
+    <div class="leg r"></div>
+    <div class="figure"><div class="head"></div><div class="body"></div></div>
+  </div>
+  <div class="rod" id="rod">
+    <svg viewBox="0 0 240 200" aria-hidden="true">
+      <path d="M22 184 L212 28" stroke="#6d4526" stroke-width="5" stroke-linecap="round"/>
+      <path d="M22 184 L212 28" stroke="#c99a63" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="48" cy="161" r="10" fill="#22262c" stroke="#a8794c" stroke-width="2"/>
+      <circle cx="48" cy="161" r="3" fill="#a8794c"/>
+      <path d="M212 28 C226 82 214 136 200 186" stroke="rgba(230,240,250,.6)" stroke-width="1.2" fill="none"/>
+      <g class="float">
+        <ellipse cx="200" cy="188" rx="6" ry="3.4" fill="#e8b271"/>
+        <path d="M200 188 V198" stroke="rgba(230,240,250,.35)" stroke-width="1"/>
+      </g>
+      <path d="M200 188 C204 194 208 198 214 200" stroke="rgba(255,255,255,.14)" fill="none"/>
+      <path d="M22 184 L22 196" stroke="#4e3521" stroke-width="3"/>
+    </svg>
+  </div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+</div>
+
+<div class="app">
+  <header class="hud">
+    <div class="brand">
+      <span class="brand-mark">Философ на лавочке</span>
+      <span class="dayline" id="dayLine">День 1 · Закат</span>
+    </div>
+    <div class="controls">
+      <button type="button" class="ghost" id="galleryBtn"><span class="long">Персонажи</span><span class="short">Лица</span></button>
+      <button type="button" class="ghost" id="savesBtn"><span class="long">Сохранения</span><span class="short">Сейвы</span></button>
+      <button type="button" class="ghost" id="restartBtn"><span class="long">Заново</span><span class="short">Сброс</span></button>
+    </div>
+  </header>
+
+  <main class="screen">
+    <section class="panel" id="panel" aria-label="Сцена">
+      <div class="scene-meta">
+        <div class="portrait" id="portrait" aria-hidden="true"></div>
+        <div class="speaker-block">
+          <span class="speaker" id="speaker">Рассказчик</span>
+          <span class="speaker-role" id="speakerRole">голос за кадром</span>
+        </div>
+        <span class="scene-no" id="sceneNo"></span>
+      </div>
+
+      <div class="ending-head" id="endingHead" hidden>
+        <div class="kicker" id="endingKicker">Финал</div>
+        <h1 class="ending-title" id="endingTitle"></h1>
+      </div>
+
+      <p class="text" id="text"></p>
+      <div class="cast" id="cast"></div>
+      <div class="choices is-hidden" id="choices"></div>
+
+      <div class="ending-foot" id="endingFoot" hidden>
+        <div class="unlocked" id="unlocked"></div>
+        <div class="ending-actions">
+          <button type="button" class="primary" id="restartEnding">Начать заново</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Галерея персонажей -->
+<div class="gallery" id="gallery" hidden>
+  <div class="gallery-backdrop" data-close-gallery></div>
+  <section class="gallery-panel" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+    <header class="gallery-head">
+      <div>
+        <div class="kicker">Кто сидел рядом</div>
+        <h2 class="gallery-title" id="galleryTitle">Персонажи</h2>
+        <div class="gallery-sub" id="galleryCount"></div>
+      </div>
+      <button type="button" class="ghost" id="closeGallery">Закрыть</button>
+    </header>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </section>
+</div>
+
+<!-- Сохранения: три ручных слота плюс автосохранение -->
+<div class="saves" id="saves" hidden>
+  <div class="gallery-backdrop" data-close-saves></div>
+  <section class="saves-panel" role="dialog" aria-modal="true" aria-labelledby="savesTitle">
+    <header class="saves-head">
+      <div>
+        <div class="kicker">Три развилки про запас</div>
+        <h2 class="saves-title" id="savesTitle">Сохранения</h2>
+        <div class="saves-sub" id="savesSub">Автосохранение идёт само. Слоты — для моментов, куда хочется вернуться.</div>
+      </div>
+      <button type="button" class="ghost" id="closeSaves">Закрыть</button>
+    </header>
+    <div class="saves-list" id="savesList"></div>
+    <p class="save-hint">Сохранения живут в localStorage этого браузера. Очистка данных сайта их тоже очистит.</p>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<p class="sr-only" id="live" aria-live="polite"></p>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ==========================================================
+     ПЕРСОНАЖИ
+     affinity — от -5 до +5, сохраняется в localStorage.
+     ========================================================== */
+  const characters = {
+    oldman:  { name: "Старик", affinity: 0, met: false, role: "старик на лавочке" },
+    girl:    { name: "Девушка", affinity: 0, met: false, role: "ищет кадр, который всё объяснит" },
+    boy:     { name: "Мальчик", affinity: 0, met: false, role: "капитан бумажного флота" },
+    suit:    { name: "Прохожий", affinity: 0, met: false, role: "прошлое в дорогом костюме" },
+    lake:    { name: "Дух озера", affinity: 0, met: false, role: "водоём, а не одиночество" },
+    under:   { name: "Голос под лавочкой", affinity: 0, met: false, role: "пауза под лавочкой" },
+    god:     { name: "Бог", affinity: 0, met: false, role: "бог или тот, кто притворяется" },
+    inner:   { name: "Внутренний голос", affinity: 0, met: false, role: "усталость с бейджем" },
+    fisher:  { name: "Рыбак", affinity: 0, met: false, role: "ловит то, что не клюёт" },
+    dog:     { name: "Собака", affinity: 0, met: false, role: "просто собака" },
+    keeper:  { name: "Смотрительница", affinity: 0, met: false, role: "метёт дорожки и судьбы" },
+    courier: { name: "Курьер", affinity: 0, met: false, role: "посылка без обратного адреса" }
+  };
+
+  const BG_LABEL = {
+    sunset: "Закат",
+    night: "Ночь",
+    dawn: "Рассвет",
+    rain: "Дождь",
+    fog: "Туман"
+  };
+
+  const ENDING_IDS = ["end_light", "end_dark", "end_paradox", "end_balance", "end_self", "end_catch"];
+
+  /* ==========================================================
+     СЦЕНАРИЙ
+     4 дня, ветвление, 8 персонажей, 5 финалов.
+     ========================================================== */
+  const scenes = [
+
+    /* ---------------- ДЕНЬ 1. ЗАКАТ ---------------- */
+    {
+      id: "d1_s1", day: 1, background: "sunset", speaker: "Рассказчик", cast: [],
+      text: `Ему тридцать пять. Он senior. Это значит: много знает, мало хочет.
+Пятница закончилась в обед. Озеро началось только сейчас.
+Лавочка тёплая. Внутри — чуть прохладнее.
+Слева сидит старик. У воды мальчик. На дорожке девушка с фотоаппаратом.
+Все делают вид, что не ждут его.`,
+      choices: [
+        { text: "Слушать старика слева.", next: "d1_old_1", effects: { oldman: 1 } },
+        { text: "Смотреть на мальчика у воды.", next: "d1_boy_1", effects: { boy: 1 } },
+        { text: "Смотреть на девушку с фотоаппаратом.", next: "d1_girl_1", effects: { girl: 1 } },
+        { text: "Просто сидеть.", next: "d1_sit", effects: { inner: 1 } }
+      ]
+    },
+    {
+      id: "d1_sit", day: 1, background: "sunset", speaker: "Рассказчик", cast: ["inner"],
+      text: `Он решил не выбирать. Это тоже выбор, только без сдачи.
+Телефон в кармане дрожит. Двадцать три непрочитанных.
+У озера непрочитанных нет. У озера вообще нет карманов.`,
+      choices: [
+        { text: "Достать телефон.", next: "d1_phone", effects: { inner: -1 } },
+        { text: "Прислушаться к старику.", next: "d1_old_1", effects: { oldman: 1 } },
+        { text: "Закрыть глаза.", next: "d1_evening", effects: { inner: 1 }, flags: { calm: true } }
+      ]
+    },
+    {
+      id: "d1_old_1", day: 1, background: "sunset", speaker: "Старик", cast: ["oldman"],
+      text: `— Пришёл.
+— Я не договаривался.
+— С озером никто не договаривается. Оно всё равно ждёт.`,
+      choices: [
+        { text: "«Вы здесь каждый вечер?»", next: "d1_old_2", effects: { oldman: 1 } },
+        { text: "«Сколько стоит покой?»", next: "d1_old_2", effects: { oldman: 1, inner: 1 } },
+        { text: "Молчать.", next: "d1_old_silence", effects: { oldman: 1 } }
+      ]
+    },
+    {
+      id: "d1_old_silence", day: 1, background: "sunset", speaker: "Старик", cast: ["oldman"],
+      text: `Старик не обиделся. Он вообще не умел обижаться на воду.
+— Молчание — это тоже разговор. Просто без обязательств.
+Он смотрел на озеро так, будто ответ уже был, но его попросили не спойлерить.`,
+      choices: [
+        { text: "«И какой ответ?»", next: "d1_old_2", effects: { oldman: 1 } },
+        { text: "Смотреть вместе с ним.", next: "d1_old_2", effects: { oldman: 2, inner: 1 } },
+        { text: "Уйти к телефону.", next: "d1_phone", effects: { oldman: -1 } }
+      ]
+    },
+    {
+      id: "d1_old_2", day: 1, background: "sunset", speaker: "Старик", cast: ["oldman"],
+      text: `— Озеро помнит всех, кто сюда приходил.
+— И что оно с ними делает?
+— Ничего. Просто помнит. В наше время это редкость.
+В кармане снова дрогнуло. Работа умела находить людей даже на дне.`,
+      choices: [
+        { text: "Ответить.", next: "d1_phone", effects: { oldman: -1 } },
+        { text: "«А меня оно помнит?»", next: "d1_old_3", effects: { oldman: 1 } },
+        { text: "Просто смотреть на воду.", next: "d1_evening", effects: { oldman: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d1_old_3", day: 1, background: "sunset", speaker: "Старик", cast: ["oldman"],
+      text: `— Оно не спрашивает, зачем ты пришёл.
+— А вы?
+— Я старый. Я спрашиваю. Но ответы мне уже не нужны.
+Старик улыбнулся уголком рта. Как будто поставил лайк в прошлом веке.`,
+      choices: [
+        { text: "«А что нужно?»", next: "d1_evening", effects: { oldman: 1 } },
+        { text: "Улыбнуться в ответ.", next: "d1_evening", effects: { oldman: 1, inner: 1 } },
+        { text: "«А это у вас удочка?»", next: "d1_rod_1", effects: { oldman: 1 } },
+        { text: "«Мне нужны ответы.»", next: "d1_evening", effects: { oldman: 1 } }
+      ]
+    },
+    {
+      id: "d1_rod_1", day: 1, background: "sunset", speaker: "Старик", cast: ["oldman"], rod: true,
+      text: `— Это у вас удочка?
+— Это палка с надеждой. Удочкой она становится, когда никто не смотрит.
+Он протянул её. Тяжёлую, старую, с честной катушкой.
+— Возьми. Всё равно не клюёт.
+— А если клюнет?
+— Тогда это будет не рыба.`,
+      choices: [
+        { text: "Взять удочку.", next: "d1_rod_2", effects: { oldman: 1, inner: 1 }, flags: { hasRod: true } },
+        { text: "«Я не умею.»", next: "d1_rod_2", effects: { oldman: 2 }, flags: { hasRod: true, rodLesson: true } },
+        { text: "«Лучше посмотрю.»", next: "d1_evening", effects: { oldman: 1 } },
+        { text: "«У меня нет времени.»", next: "d1_evening", effects: { oldman: -1, inner: -1 } }
+      ]
+    },
+    {
+      id: "d1_rod_2", day: 1, background: "sunset", speaker: "Старик", cast: ["oldman"], rod: true,
+      text: `Поплавок лёг на воду, как точка в конце длинного предложения.
+— Теперь жди.
+— Сколько?
+— Пока не перестанешь спрашивать.
+Вода держала закат. Удочка держала воду. Герой держал удочку.
+Впервые за неделю он держал что-то, что не было задачей.`,
+      choices: [
+        { text: "Ждать молча.", next: "d1_evening", effects: { oldman: 1, inner: 2 }, flags: { fished: true } },
+        { text: "«А если не клюнет?»", next: "d1_evening", effects: { oldman: 1, inner: 1 }, flags: { fished: true } },
+        { text: "Дёрнуть раньше времени.", next: "d1_evening", effects: { inner: -1 }, flags: { earlyPull: true } }
+      ]
+    },
+    {
+      id: "d1_phone", day: 1, background: "sunset", speaker: "Рассказчик", cast: ["oldman"],
+      text: `Экран загорелся. «Срочно. Прод. Горит. Ты где?»
+Три слова с точками. Как три выстрела в упор.
+Закат подождал. Закат умеет.`,
+      choices: [
+        { text: "«Я устал. Ищу другую работу.» — отправить.", next: "d1_evening", effects: { inner: 1 }, flags: { phoneAnswered: true, quitDeclared: true } },
+        { text: "Выключить телефон.", next: "d1_evening", effects: { inner: 2 }, flags: { phoneOff: true } },
+        { text: "Бросить телефон в озеро.", next: "d1_phone_throw", effects: { lake: 1, inner: 1 }, flags: { phoneThrown: true } },
+        { text: "Ответить «ок».", next: "d1_evening", effects: { inner: -2, oldman: -1 }, flags: { phoneAnswered: true } }
+      ]
+    },
+    {
+      id: "d1_phone_throw", day: 1, background: "sunset", speaker: "Старик", cast: ["oldman", "lake"],
+      text: `Телефон описал дугу. Красиво. Как в рекламе, только без гарантии.
+Бултых.
+Старик хмыкнул:
+— Озеро теперь тоже в курсе. Ему не нравится, когда звонят.`,
+      choices: [
+        { text: "«Пусть отвечает.»", next: "d1_evening", effects: { lake: 1, inner: 1 } },
+        { text: "«Я только что потерял работу.»", next: "d1_evening", effects: { oldman: 1, inner: 1 } },
+        { text: "«Была не была.»", next: "d1_evening", effects: { inner: 1 } }
+      ]
+    },
+    {
+      id: "d1_boy_1", day: 1, background: "sunset", speaker: "Мальчик", cast: ["boy"],
+      text: `У воды мальчик пускал бумажный кораблик.
+Кораблик кренился, но держался. Как большинство из нас.
+— Он не тонет, — сказал мальчик. — Он отдыхает.`,
+      choices: [
+        { text: "«Как зовут корабль?»", next: "d1_boy_2", effects: { boy: 1 } },
+        { text: "Помочь спустить на воду.", next: "d1_boy_2", effects: { boy: 2 }, flags: { boatLaunched: true } },
+        { text: "«Он всё равно утонет.»", next: "d1_boy_3", effects: { boy: -1 }, flags: { boatScoffed: true } }
+      ]
+    },
+    {
+      id: "d1_boy_2", day: 1, background: "sunset", speaker: "Мальчик", cast: ["boy"],
+      text: `— «Завтра».
+— Почему «Завтра»?
+— Потому что сегодня он ещё не поплыл.
+Мальчик сказал это с интонацией человека, у которого всё в порядке с логикой и всё в порядке с надеждой.`,
+      choices: [
+        { text: "«Хорошее имя.»", next: "d1_evening", effects: { boy: 1 } },
+        { text: "«Мой корабль назывался «Потом».»", next: "d1_boy_4", effects: { boy: 1, inner: 1 } },
+        { text: "«А если завтра не будет?»", next: "d1_boy_3", effects: { boy: -1 } }
+      ]
+    },
+    {
+      id: "d1_boy_3", day: 1, background: "sunset", speaker: "Мальчик", cast: ["boy"],
+      text: `Мальчик промолчал. Потом поправил кораблик.
+— Все так говорят.
+Он не заплакал. Он просто перестал смотреть на героя. Это было хуже.`,
+      choices: [
+        { text: "Извиниться.", next: "d1_boy_2", effects: { boy: 1 } },
+        { text: "«Я не то имел в виду.»", next: "d1_boy_4", effects: { boy: 1 } },
+        { text: "Уйти.", next: "d1_evening", effects: { boy: -1, inner: -1 } }
+      ]
+    },
+    {
+      id: "d1_boy_4", day: 1, background: "sunset", speaker: "Мальчик", cast: ["boy"],
+      text: `— «Потом» — плохое имя, — сказал мальчик. — Оно никогда не приплывает.
+Он посмотрел на воду.
+— А «Завтра» приплывает. Просто не говорит, когда.`,
+      choices: [
+        { text: "«Ты умный.»", next: "d1_evening", effects: { boy: 1 } },
+        { text: "«Спасибо.»", next: "d1_evening", effects: { boy: 1, inner: 1 } },
+        { text: "«Удачи, капитан.»", next: "d1_evening", effects: { boy: 1 } }
+      ]
+    },
+    {
+      id: "d1_girl_1", day: 1, background: "sunset", speaker: "Девушка", cast: ["girl"],
+      text: `Девушка фотографировала закат. Потом лавочку. Потом пустоту рядом с лавочкой.
+— Я ищу кадр, который всё объяснит, — сказала она. — Пока только закаты.
+— И как? Закаты объясняют?
+— Закаты объясняют, что день кончается. Дальше они не в курсе.`,
+      choices: [
+        { text: "«Что именно должно объяснить?»", next: "d1_girl_2", effects: { girl: 1 } },
+        { text: "«Сфотографируйте меня.»", next: "d1_girl_3", effects: { girl: 1 } },
+        { text: "«Кадр не объясняет. Он показывает.»", next: "d1_girl_4", effects: { girl: 1, inner: 1 } },
+        { text: "«Закат был тысячи раз. Зачем ещё?»", next: "d1_girl_4", effects: { girl: -1 } }
+      ]
+    },
+    {
+      id: "d1_girl_2", day: 1, background: "sunset", speaker: "Девушка", cast: ["girl"],
+      text: `— Всё. Почему люди уходят. Почему остаются. Почему я здесь.
+Она навела объектив на него.
+— Можно? У вас лицо человека, который забыл, что у него есть лицо.`,
+      choices: [
+        { text: "«Можно.»", next: "d1_girl_3", effects: { girl: 1 } },
+        { text: "«Не надо.»", next: "d1_evening", effects: { girl: -1 } },
+        { text: "«Только без вспышки.»", next: "d1_girl_3", effects: { girl: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d1_girl_3", day: 1, background: "sunset", speaker: "Девушка", cast: ["girl"],
+      text: `Щёлк.
+— Получилось, — сказала она. — Вы похожи на человека, который сейчас уйдёт.
+— Это комплимент?
+— Это кадр.
+Она посмотрела на экран дольше, чем нужно.`,
+      choices: [
+        { text: "«Пришлите мне.»", next: "d1_evening", effects: { girl: 1 }, flags: { photoTaken: true } },
+        { text: "«Удалите.»", next: "d1_evening", effects: { girl: -1 } },
+        { text: "«Тогда я останусь.»", next: "d1_evening", effects: { girl: 2, inner: 1 } }
+      ]
+    },
+    {
+      id: "d1_girl_4", day: 1, background: "sunset", speaker: "Девушка", cast: ["girl"],
+      text: `— Показывает — это уже много, — сказала она. — Но я хочу, чтобы объясняло.
+Она щёлкнула затвором в пустоту.
+— Пустота не объясняет. Зато не врёт.
+Ветер забрал её волосы, а он забрал себе мысль.`,
+      choices: [
+        { text: "«Тогда сфотографируйте пустоту.»", next: "d1_evening", effects: { girl: 1 } },
+        { text: "«Может, объяснять не надо.»", next: "d1_evening", effects: { girl: 1, inner: 1 } },
+        { text: "Уйти.", next: "d1_evening", effects: { girl: -1 } }
+      ]
+    },
+    {
+      id: "d1_evening", day: 1, background: "sunset", speaker: "Рассказчик", cast: ["oldman", "girl", "boy", "lake"],
+      text: `Солнце село в озеро, как монета в прорезь.
+Старик ушёл первым. Мальчика позвали домой. Девушка осталась искать свет.
+Герой остался наедине с лавочкой. Лавочка не жаловалась.`,
+      choices: [
+        { text: "Остаться до темноты.", next: "d1_night", effects: { inner: 1 } },
+        { text: "Смотреть, как гаснет свет.", next: "d1_night", effects: { inner: 1, lake: 1 } },
+        { text: "Уйти и вернуться.", next: "d1_night", effects: { inner: 1 }, flags: { returned: true } }
+      ]
+    },
+    {
+      id: "d1_night", day: 1, background: "night", speaker: "Рассказчик", cast: [],
+      text: `Ночь пришла без стука.
+Озеро стало чёрным зеркалом. В нём отражалось всё, кроме ответов.
+Под лавочкой что-то шевельнулось. Или кто-то.`,
+      choices: [
+        { text: "Заглянуть под лавочку.", next: "d1_under", effects: { under: 1 } },
+        { text: "Посмотреть на озеро.", next: "d1_lake", effects: { lake: 1 } },
+        { text: "Встать и уйти.", next: "d1_dream", effects: { inner: -1 } }
+      ]
+    },
+    {
+      id: "d1_under", day: 1, background: "night", speaker: "Голос под лавочкой", cast: ["under"],
+      text: `— Не наклоняйся. У меня нет лица.
+Голос был низкий, как вибрация телефона в чужом кармане.
+— Я здесь давно. Я подслушиваю, как люди отдыхают.`,
+      choices: [
+        { text: "«Кто вы?»", next: "d1_under_2", effects: { under: 1 } },
+        { text: "«Вам не скучно?»", next: "d1_under_2", effects: { under: 1, inner: 1 } },
+        { text: "Пнуть лавочку.", next: "d1_under_3", effects: { under: -2 } }
+      ]
+    },
+    {
+      id: "d1_under_2", day: 1, background: "night", speaker: "Голос под лавочкой", cast: ["under"],
+      text: `— Я то, что остаётся, когда уходят мысли.
+— То есть тишина?
+— Хуже. Пауза.
+Под лавочкой пахло пылью и чем-то похожим на старое «потом».`,
+      choices: [
+        { text: "«И что в паузе?»", next: "d1_dream", effects: { under: 1, inner: 1 } },
+        { text: "«Полезно.»", next: "d1_dream", effects: { under: 1 } },
+        { text: "Уйти.", next: "d1_dream", effects: { under: -1 } }
+      ]
+    },
+    {
+      id: "d1_under_3", day: 1, background: "night", speaker: "Голос под лавочкой", cast: ["under"],
+      text: `Лавочка скрипнула.
+— Ай.
+— Извините.
+— Не извиняйся. Мне редко напоминают, что я есть.
+Голос звучал почти довольно.`,
+      choices: [
+        { text: "«Вы есть?»", next: "d1_under_2", effects: { under: 1 } },
+        { text: "«Простите.»", next: "d1_dream", effects: { under: 1 } },
+        { text: "Уйти.", next: "d1_dream", effects: { under: -1 } }
+      ]
+    },
+    {
+      id: "d1_lake", day: 1, background: "night", speaker: "Дух озера", cast: ["lake"],
+      text: `Вода поднялась на ладонь и замерла.
+— Ты пришёл, — сказало озеро голосом, похожим на эхо в пустой комнате.
+— Я не звал.
+— Все так говорят. И все приходят.`,
+      choices: [
+        { text: "Бросить монету.", next: "d1_lake_2", effects: { lake: 1 }, flags: { lakeGift: true } },
+        { text: "«Зачем я вам?»", next: "d1_lake_2", effects: { lake: 1 } },
+        { text: "Отойти.", next: "d1_dream", effects: { lake: -1 } }
+      ]
+    },
+    {
+      id: "d1_lake_2", day: 1, background: "night", speaker: "Дух озера", cast: ["lake"],
+      text: `— Мне никто не нужен, — сказало озеро. — Но приятно, когда приходят.
+— Это одиночество?
+— Это водоём.
+Оно подождало. Оно умело ждать. У него было много практики.`,
+      choices: [
+        { text: "«Можно я просто посижу?»", next: "d1_dream", effects: { lake: 1, inner: 1 } },
+        { text: "«Спокойной ночи.»", next: "d1_dream", effects: { lake: 1 } },
+        { text: "«Вы тоже устали?»", next: "d1_dream", effects: { lake: 1, inner: 1 }, flags: { lakeTired: true } }
+      ]
+    },
+    {
+      id: "d1_dream", day: 1, background: "fog", speaker: "Внутренний голос", cast: ["inner"],
+      text: `Ему снился офис. В офисе не было стен — только задачи.
+Внутренний голос надел бейдж и сказал:
+— Здравствуйте. Я ваша усталость. Давно не виделись.
+— Мы виделись утром.
+— Это была не я. Это была привычка.`,
+      choices: [
+        { text: "«Ты не я.»", next: "d2_s1", effects: { inner: -1 } },
+        { text: "«Здравствуй.»", next: "d2_s1", effects: { inner: 2 }, flags: { dreamOpened: true } },
+        { text: "«Сколько тебе платят?»", next: "d2_s1", effects: { inner: 1 }, flags: { dreamJoke: true } }
+      ]
+    },
+
+    /* ---------------- ДЕНЬ 2. ДОЖДЬ ---------------- */
+    {
+      id: "d2_s1", day: 2, background: "rain", speaker: "Рассказчик", cast: [],
+      text: `Утро не пришло. Оно просто перестало быть ночью.
+Дождь. Он вернулся на лавочку, как на рабочее место.
+Зонта нет. Зато есть время.
+Время тоже шло без зонта.`,
+      choices: [
+        { text: "Встать под дерево.", next: "d2_suit", effects: { inner: 1 } },
+        { text: "Достать телефон.", next: "d2_phone_rain", effects: { inner: -1 }, when: function (s) { return !s.flags.phoneThrown; } },
+        { text: "Ждать, что кто-нибудь придёт.", next: "d2_old_rain", effects: { oldman: 1 } },
+        { text: "Забросить удочку под дождём.", next: "d2_fishing", effects: { inner: 1 }, when: function (s) { return Boolean(s.flags.hasRod); } }
+      ]
+    },
+    {
+      id: "d2_fishing", day: 2, background: "rain", speaker: "Рассказчик", cast: ["lake"], rod: true,
+      text: `Дождь шёл, поплавок стоял. Это была дискуссия.
+Озеро принимало дождь и не возвращало.
+Под водой что-то прошло — большое, спокойное, не его.
+Удочка дёрнулась. Один раз. Как будто спросила: «Ты уверен?»`,
+      choices: [
+        { text: "Подсечь.", next: "d2_fishing_catch", effects: { inner: 1 }, flags: { fishedRain: true } },
+        { text: "Ждать.", next: "d2_suit", effects: { lake: 1, inner: 2 }, flags: { fishedRain: true, waitedRain: true } },
+        { text: "Смотать удочку.", next: "d2_suit", effects: { inner: 1 } }
+      ]
+    },
+    {
+      id: "d2_fishing_catch", day: 2, background: "rain", speaker: "Рассказчик", cast: ["lake"], rod: true,
+      text: `Он подсек. На крючке висел ботинок. Левый. Не его.
+— Озеро возвращает долги, — сказал кто-то с берега. — Иногда не тем размером.
+Ботинок был тёплый. Это было страннее, чем ботинок.
+Озеро молчало с видом человека, который знает больше, но не обязан.`,
+      choices: [
+        { text: "Забрать ботинок.", next: "d2_suit", effects: { inner: 1 }, flags: { bootKept: true } },
+        { text: "Бросить обратно.", next: "d2_suit", effects: { lake: 2, inner: 1 }, flags: { bootReturned: true } }
+      ]
+    },
+    {
+      id: "d2_old_rain", day: 2, background: "rain", speaker: "Старик", cast: ["oldman"],
+      text: `Старик пришёл с зонтом. Одним.
+— Зонт один, — сказал он. — Но я старый. Мне можно.
+Он всё равно подвинулся.
+Под зонтом было тесно и почему-то спокойно.`,
+      choices: [
+        { text: "«Почему вы здесь каждый день?»", next: "d2_old_rain_2", effects: { oldman: 1 } },
+        { text: "Молчать под зонтом.", next: "d2_old_rain_2", effects: { oldman: 1, inner: 1 } },
+        { text: "Уйти под дождь.", next: "d2_suit", effects: { inner: 1 } }
+      ]
+    },
+    {
+      id: "d2_old_rain_2", day: 2, background: "rain", speaker: "Старик", cast: ["oldman"],
+      text: `— Я здесь не каждый день. Я здесь всегда. Просто не всегда заметно.
+— Это как работа?
+— Хуже. Это как привычка к себе.
+Дождь стучал по зонту, как по крыше поезда, который никуда не едет.`,
+      choices: [
+        { text: "«И как?»", next: "d2_suit", effects: { oldman: 1 } },
+        { text: "«От себя можно уйти?»", next: "d2_suit", effects: { oldman: 1, inner: 1 } },
+        { text: "«Мне пора.»", next: "d2_suit", effects: {} }
+      ]
+    },
+    {
+      id: "d2_phone_rain", day: 2, background: "rain", speaker: "Рассказчик", cast: ["inner"],
+      text: `В рабочем чате сто двадцать сообщений.
+«Ты же senior. Выручай.»
+Слово «выручай» всегда означает «работай бесплатно». Иногда — «работай в выходной». Всегда — «работай».`,
+      choices: [
+        { text: "Ответить: «Я в отпуске».", next: "d2_suit", effects: { inner: -1 }, flags: { phoneAnswered: true } },
+        { text: "Выключить.", next: "d2_suit", effects: { inner: 1 }, flags: { phoneOff: true } },
+        { text: "Выбросить в озеро.", next: "d2_suit", effects: { lake: 1, inner: 1 }, flags: { phoneThrown: true } }
+      ]
+    },
+    {
+      id: "d2_suit", day: 2, background: "rain", speaker: "Прохожий", cast: ["suit"],
+      text: `По дорожке шёл мужчина в костюме. Без зонта. Костюм дороже машины, машина осталась в прошлом.
+— Ты не меняешься, — сказал он.
+Герой узнал лицо. Своё. Десять лет назад.
+Тогда он тоже думал, что дождь — это временно.`,
+      choices: [
+        { text: "«Ты — это я?»", next: "d2_suit_2", effects: { suit: 1, inner: -1 } },
+        { text: "«Я тебя пережил.»", next: "d2_suit_3", effects: { suit: -1, inner: 1 }, flags: { suitRefused: true } },
+        { text: "Слушать молча.", next: "d2_suit_2", effects: { suit: 1 } }
+      ]
+    },
+    {
+      id: "d2_suit_2", day: 2, background: "rain", speaker: "Прохожий", cast: ["suit"],
+      text: `— Тогда я хотел всё успеть.
+— И?
+— Успел.
+Он поправил галстук, как поправляют удавку.
+— Всё, кроме одного.`,
+      choices: [
+        { text: "«Чего?»", next: "d2_suit_4", effects: { suit: 1 } },
+        { text: "«Ты выглядишь усталым.»", next: "d2_suit_4", effects: { suit: 1, inner: 1 } },
+        { text: "«Мне неинтересно.»", next: "d2_girl_rain", effects: { suit: -1, inner: -1 } }
+      ]
+    },
+    {
+      id: "d2_suit_3", day: 2, background: "rain", speaker: "Прохожий", cast: ["suit"],
+      text: `— Пережил? — Он не обиделся. — Я и есть твоя жизнь. Просто в более дорогом костюме.
+— Тогда почему ты мокрый?
+— Потому что ты меня не пускаешь.
+Дождь проходил сквозь него. Или сквозь героя. Непонятно.`,
+      choices: [
+        { text: "«Ты — прошлое.»", next: "d2_suit_4", effects: { suit: 1, inner: 1 } },
+        { text: "«Что бы ты сделал иначе?»", next: "d2_suit_4", effects: { suit: 2 } },
+        { text: "Уйти.", next: "d2_girl_rain", effects: { suit: -1 } }
+      ]
+    },
+    {
+      id: "d2_suit_4", day: 2, background: "rain", speaker: "Прохожий", cast: ["suit"],
+      text: `— Я успевал на работу, — сказал он. — На рассвет. На созвоны. На всё, где меня не было.
+Дождь стучал по его костюму, и костюм не намокал.
+— Я тебе не прошлое. Я твой план.`,
+      choices: [
+        { text: "«Я не хочу такой план.»", next: "d2_girl_rain", effects: { suit: -1, inner: 2 }, flags: { suitRefused: true } },
+        { text: "«Спасибо, что дошёл.»", next: "d2_girl_rain", effects: { suit: 2, inner: 1 }, flags: { suitForgiven: true } },
+        { text: "«Мы оба устали.»", next: "d2_girl_rain", effects: { suit: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d2_girl_rain", day: 2, background: "rain", speaker: "Девушка", cast: ["girl"],
+      text: `Девушка стояла по колено в луже и снимала отражение.
+— Ты знал, что дождь — это фотография неба?
+— Не знал.
+— Я тоже. Но вдруг.`,
+      choices: [
+        { text: "«Какой кадр вы ищете?»", next: "d2_girl_rain_2", effects: { girl: 1 } },
+        { text: "«Дождь — это просто вода.»", next: "d2_fog", effects: { girl: -1, inner: -1 } },
+        { text: "«Можно я постою рядом?»", next: "d2_girl_rain_2", effects: { girl: 2 } }
+      ]
+    },
+    {
+      id: "d2_girl_rain_2", day: 2, background: "rain", speaker: "Девушка", cast: ["girl"],
+      text: `— Кадр, который всё объяснит, — сказала она. — Я боюсь, что когда найду, мне не понравится ответ.
+Она опустила камеру.
+— Поэтому ищу медленно. Это единственное, что я делаю медленно.`,
+      choices: [
+        { text: "«Может, ответа нет.»", next: "d2_fog", effects: { girl: 1 } },
+        { text: "«Может, ответ и есть кадр.»", next: "d2_fog", effects: { girl: 1, inner: 1 } },
+        { text: "«Я бы посмотрел.»", next: "d2_fog", effects: { girl: 2 }, flags: { girlPhoto: true } }
+      ]
+    },
+    {
+      id: "d2_fog", day: 2, background: "fog", speaker: "Рассказчик", cast: ["under", "lake"],
+      text: `К вечеру выпал туман. Не тот, что скрывает, а тот, что спрашивает.
+Из-под лавочки — шорох. Над водой — вдох.
+— Мы здесь, — сказали сразу двое. Голоса не совпали. Как обычно.`,
+      choices: [
+        { text: "Наклониться к лавочке.", next: "d2_fog_under", effects: { under: 1 } },
+        { text: "Посмотреть на воду.", next: "d2_fog_lake", effects: { lake: 1 } },
+        { text: "Уйти домой.", next: "d2_night2", effects: { inner: 1 } }
+      ]
+    },
+    {
+      id: "d2_fog_under", day: 2, background: "fog", speaker: "Голос под лавочкой", cast: ["under"],
+      text: `— Завтра придёт он.
+— Кто он?
+— Тот, кто притворяется. Или тот, кто есть. Для тебя разницы нет.
+Голос под лавочкой говорил шёпотом, но слышно было лучше, чем крик.`,
+      choices: [
+        { text: "«Как его узнать?»", next: "d2_fog_2", effects: { under: 1 } },
+        { text: "«Мне это не нужно.»", next: "d2_night2", effects: { under: -1 } },
+        { text: "«А ты кто?»", next: "d2_fog_2", effects: { under: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d2_fog_lake", day: 2, background: "fog", speaker: "Дух озера", cast: ["lake"],
+      text: `— Завтра, — сказало озеро. — Не бойся. Боги приходят и уходят. Вода остаётся.
+— Утешили.
+— Я не утешаю. Я констатирую.
+Оно было спокойным. Как человек, который давно сдал экзамен.`,
+      choices: [
+        { text: "«Кто придёт?»", next: "d2_fog_2", effects: { lake: 1 } },
+        { text: "«Вода тоже уходит.»", next: "d2_fog_2", effects: { lake: 1, inner: 1 } },
+        { text: "Уйти.", next: "d2_night2", effects: { lake: -1 } }
+      ]
+    },
+    {
+      id: "d2_fog_2", day: 2, background: "fog", speaker: "Голос под лавочкой", cast: ["under", "lake"],
+      text: `Они говорили по очереди, как старые ведущие.
+— Он предложит сделку.
+— Не соглашайся.
+— Или соглашайся.
+— Мы не союзники. Нам просто скучно.`,
+      choices: [
+        { text: "«Почему я?»", next: "d2_night2", effects: { under: 1, lake: 1 } },
+        { text: "«Я сам решу.»", next: "d2_night2", effects: { inner: 2 } },
+        { text: "«Вы оба врёте.»", next: "d2_night2", effects: { under: -1, lake: -1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d2_night2", day: 2, background: "night", speaker: "Внутренний голос", cast: ["inner"],
+      text: `Ночью ему снился тот же офис, но без мебели.
+Внутренний голос сидел на полу.
+— Завтра важный день.
+— Каждый день важный, если не спать.
+— Тогда поспи. Я посторожу.
+Голос не умел сторожить. Но он старался.`,
+      choices: [
+        { text: "«Что мне выбрать?»", next: "d3_dawn", effects: { inner: 1 } },
+        { text: "«Я хочу спать.»", next: "d3_dawn", effects: { inner: 1 } },
+        { text: "«Ты — просто усталость.»", next: "d3_dawn", effects: { inner: -1 } }
+      ]
+    },
+
+    /* ---------------- ДЕНЬ 3. РАССВЕТ ---------------- */
+    {
+      id: "d3_dawn", day: 3, background: "dawn", speaker: "Рассказчик", cast: [],
+      text: `Он не спал. Он вышел.
+Рассвет был серым, как черновик.
+На дорожке — собака. У сетки — смотрительница с метлой. На ступеньках — курьер с коробкой. У воды — рыбак с лодкой.
+Все были заняты. Все делали вид, что это и есть жизнь.
+До лавочки оставалось несколько шагов. Можно было выбрать, с кем их сделать.`,
+      choices: [
+        { text: "Подойти к собаке.", next: "d3_dog_1", effects: { dog: 1 } },
+        { text: "Подойти к смотрительнице.", next: "d3_keeper_1", effects: { keeper: 1 } },
+        { text: "Подойти к курьеру.", next: "d3_courier_1", effects: { courier: 1 } },
+        { text: "Подойти к рыбаку.", next: "d3_fisher_1", effects: { fisher: 1 } }
+      ]
+    },
+    {
+      id: "d3_dog_1", day: 3, background: "dawn", speaker: "Рассказчик", cast: ["dog"],
+      text: `Собака сидела у лавочки и держала в зубах палку. Не бросала. Ждала, когда заметят.
+У неё не было мнения о карьере. Это подкупало.
+— Ты чья? — спросил он.
+Собака не ответила. Она была честнее.`,
+      choices: [
+        { text: "Бросить палку.", next: "d3_dog_2", effects: { dog: 2, inner: 1 } },
+        { text: "Погладить.", next: "d3_dog_2", effects: { dog: 1, inner: 1 } },
+        { text: "«У меня нет собаки.»", next: "d3_dog_2", effects: { dog: 1 } }
+      ]
+    },
+    {
+      id: "d3_dog_2", day: 3, background: "dawn", speaker: "Рассказчик", cast: ["dog"],
+      text: `Палка летела недалеко. Собака принесла её обратно и положила у ног.
+Она не сказала: «Ты справишься». Она сказала хвостом.
+Этого хватило.
+— Ладно, — сказал он. — Пошли.
+Собака пошла первой. Она знала дорогу. Или делала вид.`,
+      choices: [
+        { text: "Бросить ещё раз.", next: "d3_s1", effects: { dog: 1, inner: 1 }, flags: { dogFriend: true } },
+        { text: "Пойти к лавочке.", next: "d3_s1", effects: { dog: 1 } }
+      ]
+    },
+    {
+      id: "d3_keeper_1", day: 3, background: "dawn", speaker: "Смотрительница", cast: ["keeper"],
+      text: `— Не спится? — спросила смотрительница. Метла у неё была громче голоса.
+— Не спится.
+— Здесь многие не спят. Потом привыкают. Потом уезжают.
+Она подмела невидимый мусор. У неё это получалось убедительно.`,
+      choices: [
+        { text: "«Вы давно здесь?»", next: "d3_keeper_2", effects: { keeper: 1 } },
+        { text: "«Кто это там, на лавочке?»", next: "d3_keeper_2", effects: { keeper: 1, oldman: 1 } },
+        { text: "Взять вторую метлу.", next: "d3_keeper_2", effects: { keeper: 2, inner: 1 }, flags: { helpedKeeper: true } }
+      ]
+    },
+    {
+      id: "d3_keeper_2", day: 3, background: "dawn", speaker: "Смотрительница", cast: ["keeper"],
+      text: `— Тридцать лет. Сначала думала: временно. Потом метла стёрлась. Я нет.
+— Это философия?
+— Это инвентарь.
+Она посмотрела на озеро.
+— Старик на лавочке не ждёт. Он дежурит. У всех должна быть смена.`,
+      choices: [
+        { text: "«У меня тоже?»", next: "d3_s1", effects: { keeper: 1, inner: 1 }, flags: { keeperAdvice: true } },
+        { text: "«Передайте ему, что я приду.»", next: "d3_s1", effects: { keeper: 1, oldman: 1 } },
+        { text: "«Спасибо за дорожку.»", next: "d3_s1", effects: { keeper: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_courier_1", day: 3, background: "dawn", speaker: "Курьер", cast: ["courier"],
+      text: `— Вы? — курьер сверился с коробкой. — Есть посылка. Без обратного адреса.
+— Я ничего не заказывал.
+— Все так говорят. Потом открывают.
+Коробка была маленькая. Внутри что-то шуршало. Как прошлое.`,
+      choices: [
+        { text: "Открыть.", next: "d3_courier_open", effects: { courier: 1, inner: 1 }, flags: { openedBox: true } },
+        { text: "Взять и не открывать.", next: "d3_courier_keep", effects: { inner: 1 }, flags: { keptBox: true } },
+        { text: "«Отправьте обратно.»", next: "d3_courier_refuse", effects: { courier: 1, inner: 1 }, flags: { refusedBox: true } }
+      ]
+    },
+    {
+      id: "d3_courier_open", day: 3, background: "dawn", speaker: "Курьер", cast: ["courier"],
+      text: `Внутри лежала старая флешка, наклейка «на память» и записка: «Ты не обязан».
+Он прочитал три раза. Ничего не изменилось. Всё изменилось.
+— Что там? — спросил курьер.
+— Работа.
+— Понял. Соболезную.`,
+      choices: [
+        { text: "Выбросить флешку в озеро.", next: "d3_s1", effects: { lake: 1, inner: 1, courier: 1 }, flags: { threwFlash: true } },
+        { text: "Оставить записку.", next: "d3_s1", effects: { inner: 2, courier: 1 }, flags: { keptNote: true } }
+      ]
+    },
+    {
+      id: "d3_courier_keep", day: 3, background: "dawn", speaker: "Курьер", cast: ["courier"],
+      text: `Он взял коробку и не открыл.
+Она была лёгкая. Как все вещи, которые лучше не трогать.
+— Донесёте? — спросил курьер.
+— Донесу.
+— До куда?
+— Пока не станет легче.`,
+      choices: [
+        { text: "«Пойдём со мной.»", next: "d3_s1", effects: { courier: 2, inner: 1 }, flags: { courierFriend: true } },
+        { text: "«Дальше я сам.»", next: "d3_s1", effects: { courier: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_courier_refuse", day: 3, background: "dawn", speaker: "Курьер", cast: ["courier"],
+      text: `Он вернул коробку.
+Курьер кивнул:
+— Правильно. Иногда лучше не получать.
+— Это ваш опыт?
+— Это мой маршрут.
+Он ушёл. Коробка осталась у него. Или у героя. С такими вещами неясно.`,
+      choices: [
+        { text: "«Подождите. Кто отправитель?»", next: "d3_s1", effects: { courier: 1, inner: 1 }, flags: { askedSender: true } },
+        { text: "Отпустить.", next: "d3_s1", effects: { courier: 1 } }
+      ]
+    },
+    {
+      id: "d3_fisher_1", day: 3, background: "dawn", speaker: "Рыбак", cast: ["fisher"], rod: true,
+      text: `Рыбак сидел в лодке у берега. Лодка была на воде, но никуда не плыла.
+— Клюёт? — спросил герой.
+— Не клюёт. Рыба думает.
+Он вытащил удочку. Точно такую же, как у старика. Или ту же самую.
+— Ты его знаешь? — спросил рыбак, не оборачиваясь.`,
+      choices: [
+        { text: "«Кого?»", next: "d3_fisher_2", effects: { fisher: 1 } },
+        { text: "«Старика?»", next: "d3_fisher_2", effects: { fisher: 1, oldman: 1 } },
+        { text: "«Я здесь недавно.»", next: "d3_fisher_2", effects: { fisher: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_fisher_2", day: 3, background: "dawn", speaker: "Рыбак", cast: ["fisher"], rod: true,
+      text: `— Старика. Он мой брат. Двадцать лет не разговариваем.
+— Из-за чего?
+— Из-за рыбы. Он сказал, что я забираю у озера больше, чем отдаю. А я сказал, что он просто завидует.
+Рыбак посмотрел на воду.
+— Оба были правы. Это худший вид ссоры.`,
+      choices: [
+        { text: "«Помиритесь.»", next: "d3_fisher_3", effects: { fisher: 2, inner: 1 }, flags: { triedReconcile: true } },
+        { text: "«Из-за рыбы?»", next: "d3_fisher_3", effects: { fisher: 1, inner: 1 } },
+        { text: "«У меня тоже есть брат.» (ложь)", next: "d3_fisher_3", effects: { fisher: 1, inner: 1 }, flags: { liedBrother: true } }
+      ]
+    },
+    {
+      id: "d3_fisher_3", day: 3, background: "dawn", speaker: "Рыбак", cast: ["fisher"], rod: true,
+      text: `— Ладно, — сказал рыбак. — Раз пришёл, держи.
+Он протянул удочку. На крючке вместо червяка была маленькая звёздочка. Мокрая, не светящаяся.
+— Это не наживка. Это напоминание. Иногда клюёт только то, чего нет.`,
+      choices: [
+        { text: "Взять удочку.", next: "d3_s1", effects: { fisher: 1 }, flags: { hasRod: true, starBait: true } },
+        { text: "«Я не ловлю то, чего нет.»", next: "d3_s1", effects: { fisher: 1, inner: 1 } },
+        { text: "Забросить прямо сейчас.", next: "d3_fisher_4", effects: { fisher: 2 }, flags: { hasRod: true, starBait: true } }
+      ]
+    },
+    {
+      id: "d3_fisher_4", day: 3, background: "dawn", speaker: "Рассказчик", cast: ["fisher", "lake"], rod: true,
+      text: `Он забросил. Поплавок встал. Звёздочка на крючке тихо светилась под водой. Или это было отражение.
+Рыбак засмеялся:
+— Первый раз вижу, чтобы кто-то ловил до завтрака.
+Озеро молчало. Оно умело держать паузу.`,
+      choices: [
+        { text: "Ждать.", next: "d3_s1", effects: { lake: 1, inner: 2 }, flags: { waitedStar: true } },
+        { text: "Вытащить.", next: "d3_s1", effects: { lake: 1, inner: 1 }, flags: { pulledStar: true } }
+      ]
+    },
+
+    /* ---------------- ДЕНЬ 3. ТУМАН ---------------- */
+    {
+      id: "d3_s1", day: 3, background: "fog", speaker: "Рассказчик", cast: [],
+      text: `К лавочке он подошёл, когда туман уже съел берег.
+На ней уже кто-то сидел. Дешёвое пальто. Взгляд, как у прораба.
+— Садись, — сказал он. — Я по делу.`,
+      choices: [
+        { text: "«Вы кто?»", next: "d3_god_1", effects: { god: 1 } },
+        { text: "Сесть молча.", next: "d3_god_silent", effects: { inner: 1 } },
+        { text: "«Я вас не вызывал.»", next: "d3_god_sass", effects: { god: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_god_silent", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `Герой сел. Они молчали минуту — целую минуту, без телефонов.
+— Хорошо сидишь, — сказал незнакомец. — Редко кто умеет просто сидеть.
+— Это единственное, что я теперь умею хорошо.
+— Начало.`,
+      choices: [
+        { text: "«Вы кто?»", next: "d3_god_1", effects: { god: 1 } },
+        { text: "«Я не хочу начинать.»", next: "d3_god_1", effects: { god: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_god_sass", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `— Я вас не вызывал.
+— Никто не вызывает. Я прихожу по расписанию, а не по желанию.
+Он подвинулся, как будто лавочка была его.
+— Садись. Разговор будет короткий. Как жизнь.`,
+      choices: [
+        { text: "«Вы кто?»", next: "d3_god_1", effects: { god: 1 } },
+        { text: "Сесть.", next: "d3_god_1", effects: { inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_god_1", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `— Бог, — сказал он. — Или тот, кто им притворяется. Комментарий в шапке профиля я не менял.
+— Почему вы здесь?
+— У меня перерыв. Озеро красивое. Люди усталые.
+Он посмотрел на героя, как на незакрытый тикет.`,
+      choices: [
+        { text: "«Докажите.»", next: "d3_god_proof", effects: { god: 1, inner: 1 } },
+        { text: "«Почему люди страдают?»", next: "d3_god_why", effects: { god: 1 } },
+        { text: "Засмеяться.", next: "d3_god_mock", effects: { god: 1, inner: 1 }, flags: { mockedGod: true } }
+      ]
+    },
+    {
+      id: "d3_god_proof", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `Бог посмотрел на дождь. Дождь остановился.
+Потом посмотрел на лужу. Лужа осталась.
+— Доказательство — это то, что ты уже решил. Остальное — погода.
+Он вытер руки о пальто. Пальто было сухим.`,
+      choices: [
+        { text: "«Хорошо. Я верю.»", next: "d3_god_2", effects: { god: 1 }, flags: { believedGod: true } },
+        { text: "«Это был ветер.»", next: "d3_god_2", effects: { god: -1, inner: 1 } },
+        { text: "«Я не поверю всё равно.»", next: "d3_god_2", effects: { inner: 1 }, flags: { mockedGod: true } }
+      ]
+    },
+    {
+      id: "d3_god_why", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `— Почему люди страдают? — потому что вы свободны.
+— Это отговорка.
+— Это единственная честная. За всё остальное я бы уже извинился.
+Он сказал это без пафоса. Как говорят «смена закончилась».`,
+      choices: [
+        { text: "«Свобода — плохая компенсация.»", next: "d3_god_2", effects: { god: 1, inner: 1 } },
+        { text: "«А вы страдаете?»", next: "d3_god_2", effects: { god: 1, inner: 1 } },
+        { text: "«Ладно. Верю.»", next: "d3_god_2", effects: { god: 1 }, flags: { believedGod: true } }
+      ]
+    },
+    {
+      id: "d3_god_mock", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `Герой засмеялся. Долго, некрасиво, с облегчением.
+Бог не обиделся.
+— Первый раз за неделю, — сказал он. — Смех лучше молитвы. И короче.
+— Вы не бог.
+— Возможно. Но перерыв у меня настоящий.`,
+      choices: [
+        { text: "«Вы не бог.»", next: "d3_god_2", effects: { god: 1, inner: 1 } },
+        { text: "«Простите.»", next: "d3_god_2", effects: { god: 1, inner: 1 } },
+        { text: "«Спасибо.»", next: "d3_god_2", effects: { god: 2, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_god_2", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `— Ты сгорел, — сказал Бог. — Не как звезда. Как лампочка, которую забыли выключить.
+— И что мне делать?
+— Обычно просят здоровье. Или деньги. Ты просишь смысл. Скучный.
+В тумане кто-то засмеялся. Наверное, озеро.`,
+      choices: [
+        { text: "«Дайте смысл.»", next: "d3_boy_god", effects: { god: 1 }, flags: { askedMeaning: true } },
+        { text: "«Дайте работу без смысла, но с деньгами.»", next: "d3_boy_god", effects: { god: 1, inner: 1 } },
+        { text: "«Ничего не надо.»", next: "d3_boy_god", effects: { god: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_boy_god", day: 3, background: "fog", speaker: "Мальчик", cast: ["boy", "god"],
+      text: `Пришёл мальчик с новым корабликом.
+— А вы кто?
+— Бог.
+— А умеете сделать, чтобы он никогда не тонул?
+Бог подумал. Честно подумал.
+— Нет.
+Мальчик кивнул:
+— Ладно. Я сам.`,
+      choices: [
+        { text: "«Он прав.»", next: "d3_girl_god", effects: { boy: 1, god: 1 } },
+        { text: "«Мир несправедлив, малыш.»", next: "d3_girl_god", effects: { boy: -1, inner: -1 } },
+        { text: "Помочь спустить кораблик.", next: "d3_girl_god", effects: { boy: 2, inner: 1 }, flags: { boatLaunched: true } }
+      ]
+    },
+    {
+      id: "d3_girl_god", day: 3, background: "fog", speaker: "Девушка", cast: ["girl", "god"],
+      text: `Девушка навела камеру на Бога. Затвор щёлкнул.
+На экране была лавочка. Пустая.
+— Обидно, — сказала она. — А я так ищу.
+Бог посмотрел на экран и ничего не сказал. У богов плохо с фотогеничностью.`,
+      choices: [
+        { text: "«Сфотографируйте лавочку. Она честная.»", next: "d3_under_god", effects: { girl: 2 }, flags: { girlPhoto: true } },
+        { text: "«Некоторые вещи не в кадре.»", next: "d3_under_god", effects: { girl: 1 } },
+        { text: "«Может, вас просто нет в его плане.»", next: "d3_under_god", effects: { girl: -1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_under_god", day: 3, background: "fog", speaker: "Голос под лавочкой", cast: ["under", "god"],
+      text: `Из-под лавочки, тихо:
+— Он не бог. Он тоже устал. Просто у него хорошее пальто.
+Бог услышал. Не обернулся.
+— Это старый спор, — сказал он. — Мы оба не помним, кто начал.
+— Он врёт, — сказала лавочка. Потом добавила: — Наверное.`,
+      choices: [
+        { text: "«Так кто из вас бог?»", next: "d3_old_god", effects: { under: 1, god: 1 } },
+        { text: "Сохранить секрет.", next: "d3_old_god", effects: { under: 1, inner: 1 } },
+        { text: "Рассказать всем.", next: "d3_old_god", effects: { god: -1, under: -1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_old_god", day: 3, background: "fog", speaker: "Старик", cast: ["oldman", "god"],
+      text: `Старик подошёл и кивнул Богу, как коллеге.
+— Мы знакомы дольше, чем ты думаешь.
+— Вы тоже?..
+— Нет. Я просто сижу. Иногда это больше.
+Бог ничего не возразил. Это было почти ответом.`,
+      choices: [
+        { text: "«Вы знали, что он придёт?»", next: "d3_choice", effects: { oldman: 1 } },
+        { text: "«Вы тоже притворяетесь?»", next: "d3_choice", effects: { oldman: 1, inner: 1 } },
+        { text: "Промолчать.", next: "d3_choice", effects: { oldman: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_choice", day: 3, background: "fog", speaker: "Бог", cast: ["god"],
+      text: `— Ладно, — сказал Бог. — Дело. Я забираю твою усталость.
+— Взамен?
+— Тридцать пять лет. Все. Ничего не останется, кроме покоя.
+Он даже не улыбался. Это было честно. Честнее вакансий.`,
+      choices: [
+        { text: "Согласиться.", next: "d3_night", effects: { god: 1, inner: -2 }, flags: { dealAccepted: true } },
+        { text: "Отказаться.", next: "d3_night", effects: { god: 1, inner: 2 }, flags: { dealRefused: true } },
+        { text: "«А можно только усталость, без лет?»", next: "d3_night", effects: { god: 1, inner: 1 }, flags: { askedBetterDeal: true } },
+        { text: "«Вы предлагаете то же, что работа.»", next: "d3_night", effects: { god: 1, inner: 1 }, flags: { dealRefused: true, mockedGod: true } }
+      ]
+    },
+    {
+      id: "d3_night", day: 3, background: "night", speaker: "Рассказчик", cast: ["lake"],
+      text: `Бог ушёл по дорожке, не оставив следов. Туман проводил его до остановки.
+На лавочке остался герой и его тридцать пять лет.
+Озеро смотрело. Как бухгалтер. Без осуждения, но с цифрами.`,
+      choices: [
+        { text: "Остаться на лавочке.", next: "d3_lake", effects: { lake: 1, inner: 1 } },
+        { text: "Пойти домой.", next: "d4_morning", effects: { inner: 1 } },
+        { text: "Крикнуть в туман.", next: "d4_morning", effects: { inner: 1 } }
+      ]
+    },
+    {
+      id: "d3_lake", day: 3, background: "night", speaker: "Дух озера", cast: ["lake"],
+      text: `Вода подошла к берегу. Ближе, чем обычно. Озеро умело быть ближе.
+— Он предлагал то же, что я.
+— И что вы предлагаете?
+— Забыть. Только не годы — вечер. Один.
+— Зачем?
+— Чтобы вернуться.`,
+      choices: [
+        { text: "«Я вернусь.»", next: "d4_morning", effects: { lake: 1, inner: 1 } },
+        { text: "«Я не хочу забывать.»", next: "d4_morning", effects: { lake: 1, inner: 1 } },
+        { text: "«А если я не вернусь?»", next: "d4_morning", effects: { lake: 1 } }
+      ]
+    },
+
+    /* ---------------- ДЕНЬ 4. УТРО ---------------- */
+    {
+      id: "d4_morning", day: 4, background: "dawn", speaker: "Рассказчик", cast: ["fisher", "dog", "keeper", "courier"],
+      text: `Последнее утро он встретил на ногах.
+Озеро было тихим, как человек, который всё решил, но ещё не сказал.
+У воды сидел рыбак. На дорожке ждала собака. Смотрительница несла метлу, как посох. Курьер спал на ступеньках.
+У него было время выбрать, с кем провести это утро.`,
+      choices: [
+        { text: "Порыбачить с рыбаком.", next: "d4_fishing_1", effects: { fisher: 1 }, when: function (s) { return Boolean(s.flags.hasRod); } },
+        { text: "Погулять с собакой.", next: "d4_dog", effects: { dog: 1 } },
+        { text: "Помочь смотрительнице.", next: "d4_keeper", effects: { keeper: 1 } },
+        { text: "Разбудить курьера.", next: "d4_courier", effects: { courier: 1 } }
+      ]
+    },
+    {
+      id: "d4_dog", day: 4, background: "dawn", speaker: "Рассказчик", cast: ["dog"],
+      text: `Собака ждала у лавочки. В зубах — та же палка. Или новая. У собак это не важно.
+Они пошли к воде. Собака бежала впереди и оборачивалась: «Ты идёшь?»
+Он шёл. Это было всё, что от него требовалось.`,
+      choices: [
+        { text: "Бросить палку.", next: "d4_s1", effects: { dog: 2, inner: 1 }, flags: { dogWalked: true } },
+        { text: "Сесть рядом.", next: "d4_s1", effects: { dog: 1, inner: 1 } },
+        { text: "«Мне пора.»", next: "d4_s1", effects: {} }
+      ]
+    },
+    {
+      id: "d4_keeper", day: 4, background: "dawn", speaker: "Смотрительница", cast: ["keeper"],
+      text: `— Поможешь? — смотрительница протянула вторую метлу.
+— Я не умею.
+— Никто не умеет. Метла не спрашивает.
+Они мели дорожку. Листья возвращались. Они мели снова.
+Это была самая бессмысленная и самая честная работа за неделю.`,
+      choices: [
+        { text: "Мести молча.", next: "d4_s1", effects: { keeper: 2, inner: 1 }, flags: { swept: true } },
+        { text: "«Зачем? Всё равно наметёт.»", next: "d4_s1", effects: { keeper: 1, inner: 1 } },
+        { text: "«У вас есть философия.»", next: "d4_s1", effects: { keeper: 1 } }
+      ]
+    },
+    {
+      id: "d4_courier", day: 4, background: "dawn", speaker: "Курьер", cast: ["courier"],
+      text: `Курьер спал на ступеньках, обняв коробку.
+— Эй, — сказал герой. — Ты живой?
+— Работаю, — сказал курьер, не открывая глаз. — Это разные вещи.
+— Я знаю.
+Курьер открыл один глаз.
+— Тогда ты знаешь больше меня. Плохо.`,
+      choices: [
+        { text: "Дать ему кофе.", next: "d4_s1", effects: { courier: 2, inner: 1 }, flags: { courierCoffee: true } },
+        { text: "«Иди домой.»", next: "d4_s1", effects: { courier: 1, inner: 1 } },
+        { text: "«Сколько адресов осталось?»", next: "d4_s1", effects: { courier: 1 } }
+      ]
+    },
+    {
+      id: "d4_fishing_1", day: 4, background: "dawn", speaker: "Рыбак", cast: ["fisher"], rod: true,
+      text: `— Удочка при тебе, — сказал рыбак. — Значит, ещё не всё.
+— Что не всё?
+— Всё.
+Он подвинулся. В лодке было место. В жизни тоже, но об этом не говорили.`,
+      choices: [
+        { text: "Забросить.", next: "d4_fishing_2", effects: { fisher: 1, inner: 1 } },
+        { text: "«Я не хочу ничего ловить.»", next: "d4_fishing_3", effects: { fisher: 1, inner: 1 } },
+        { text: "Смотреть на воду.", next: "d4_fishing_2", effects: { lake: 1 } }
+      ]
+    },
+    {
+      id: "d4_fishing_2", day: 4, background: "dawn", speaker: "Рассказчик", cast: ["fisher", "lake"], rod: true,
+      text: `Поплавок стоял. Потом дрогнул. Потом ушёл под воду.
+Рыбак не двигался.
+— Не тяни. Пусть думает, что ты не заметил.
+Сердце у героя делало то, чего не делало давно. Оно стучало.`,
+      choices: [
+        { text: "Ждать.", next: "d4_fishing_catch", effects: { lake: 1, inner: 1 }, flags: { starBite: true } },
+        { text: "Подсечь.", next: "d4_fishing_catch", effects: { inner: 1 }, flags: { starBite: true, pulledEarly: true } }
+      ]
+    },
+    {
+      id: "d4_fishing_catch", day: 4, background: "dawn", speaker: "Рассказчик", cast: ["fisher", "lake"], rod: true,
+      text: `Он вытащил.
+На крючке висела звезда. Маленькая, мокрая, настоящая.
+Она не светила. Она просто была.
+— Это не рыба, — сказал рыбак.
+— Я знаю.
+— Это твой улов. Дальше сам.
+Звезда капнула на ладонь и стала обычной монетой. Или не стала.`,
+      choices: [
+        { text: "Забрать звезду.", next: "d4_s1", effects: { lake: 1, inner: 1 }, flags: { caughtStar: true, keptStar: true } },
+        { text: "Отпустить обратно.", next: "d4_s1", effects: { lake: 2, inner: 1 }, flags: { caughtStar: true, releasedStar: true } },
+        { text: "«Это была монета.»", next: "d4_s1", effects: { inner: 1 }, flags: { deniedStar: true } }
+      ]
+    },
+    {
+      id: "d4_fishing_3", day: 4, background: "dawn", speaker: "Рыбак", cast: ["fisher"], rod: true,
+      text: `— Можно просто сидеть, — сказал рыбак. — Это тоже способ.
+— Какой?
+— Никакой. Просто способ.
+Они сидели. Рыба не клевала. Мир не рушился.`,
+      choices: [
+        { text: "«Спасибо.»", next: "d4_s1", effects: { fisher: 2, inner: 1 } },
+        { text: "«Пойду.»", next: "d4_s1", effects: { fisher: 1 } },
+        { text: "Забросить в последний момент.", next: "d4_fishing_2", effects: { fisher: 1 } }
+      ]
+    },
+
+    /* ---------------- ДЕНЬ 4. ФИНАЛЬНЫЙ ЗАКАТ ---------------- */
+    {
+      id: "d4_s1", day: 4, background: "sunset", speaker: "Рассказчик", cast: ["oldman", "girl", "boy", "lake"],
+      text: `Четвёртый вечер. Озеро отражало всё, что он не хотел видеть.
+На лавочке сидели все. Даже те, кого не было.
+— Ну? — спросил старик. — Что ты решил?
+— Я ещё не решил.
+— Хорошо. Реши до заката. Закат умеет заканчивать.`,
+      choices: [
+        { text: "Поговорить со стариком.", next: "d4_old_final", effects: { oldman: 1 } },
+        { text: "Поговорить с девушкой.", next: "d4_girl_final", effects: { girl: 1 } },
+        { text: "Поговорить с мальчиком.", next: "d4_boy_final", effects: { boy: 1 } },
+        { text: "Слушать озеро.", next: "d4_silent_final", effects: { inner: 1, lake: 1 } }
+      ]
+    },
+    {
+      id: "d4_old_final", day: 4, background: "sunset", speaker: "Старик", cast: ["oldman"],
+      text: `— Я сижу здесь четыре дня и ничего не понял.
+— Ничего — это тоже результат.
+— Плохой.
+— Результат — не оценка. Это то, что осталось.
+Он посмотрел на закат. Закат не спорил.`,
+      choices: [
+        { text: "«А что осталось у вас?»", next: "d4_god_final", effects: { oldman: 1, inner: 1 } },
+        { text: "«Я не хочу остаться здесь навсегда.»", next: "d4_god_final", effects: { oldman: 1 } },
+        { text: "«Спасибо, что не спрашивали.»", next: "d4_god_final", effects: { oldman: 2, inner: 1 } }
+      ]
+    },
+    {
+      id: "d4_girl_final", day: 4, background: "sunset", speaker: "Девушка", cast: ["girl"],
+      text: `— Я так и не нашла кадр, — сказала она.
+— Может, его и нет.
+— Может, я его и есть.
+Она впервые посмотрела на него, а не сквозь. Это было почти неловко. Почти приятно.`,
+      choices: [
+        { text: "«Тогда я в кадре.»", next: "d4_god_final", effects: { girl: 2 }, flags: { girlPhoto: true } },
+        { text: "«Не торопитесь. У вас ещё есть плёнка.»", next: "d4_god_final", effects: { girl: 1 } },
+        { text: "«Удачи.»", next: "d4_god_final", effects: {} }
+      ]
+    },
+    {
+      id: "d4_boy_final", day: 4, background: "sunset", speaker: "Мальчик", cast: ["boy"],
+      text: `— Кораблик доплыл, — сказал мальчик. — До середины.
+— А дальше?
+— Дальше озеро. Дальше не его дело.
+Он сказал это очень серьёзно. Как капитан. Как философ. Как ребёнок.`,
+      choices: [
+        { text: "«Ты когда-нибудь вырастешь и устанешь.»", next: "d4_god_final", effects: { boy: -1, inner: -1 } },
+        { text: "«Хороший кораблик.»", next: "d4_god_final", effects: { boy: 2, inner: 1 } },
+        { text: "«А что дальше?»", next: "d4_god_final", effects: { boy: 1 } }
+      ]
+    },
+    {
+      id: "d4_silent_final", day: 4, background: "sunset", speaker: "Дух озера", cast: ["lake", "inner"],
+      text: `Он слушал воду. Вода слушала его.
+— Ты уже знаешь, — сказало озеро.
+— Знаю.
+— Тогда не спрашивай меня. Я водоём.
+Где-то под лавочкой тихо согласились.`,
+      choices: [
+        { text: "«Тогда я просто побуду.»", next: "d4_god_final", effects: { lake: 1, inner: 2 } },
+        { text: "«А если ошибусь?»", next: "d4_god_final", effects: { lake: 1, inner: 1 } }
+      ]
+    },
+    {
+      id: "d4_god_final", day: 4, background: "sunset", speaker: "Бог", cast: ["god", "inner"],
+      text: `Бог появился рядом, как будто стоял в очереди.
+— Ну что?
+— Странный у вас отпуск.
+— Не жалуюсь.
+Он сел на край лавочки. Край был холодный. Всем хватало.
+— Выбирай. Я не буду уговаривать. У меня ещё озеро.
+Герой посмотрел на воду. Вода не подсказывала.`,
+      choices: [
+        { text: "«Хочу света. Настоящего.»", final: true, stance: "light", effects: { god: 1, inner: 1 } },
+        { text: "«Хочу покоя. Даже если он серый.»", final: true, stance: "dark", effects: { god: 1, inner: -1 } },
+        { text: "«Ничего не хочу. Я просто есть.»", final: true, stance: "balance", effects: { inner: 1 } },
+        { text: "«Я сам.»", final: true, stance: "self", effects: { inner: 1 }, flags: { selfDeclared: true } }
+      ]
+    },
+
+    /* ---------------- ФИНАЛЫ ---------------- */
+    {
+      id: "end_light", day: 4, background: "dawn", speaker: "Рассказчик", cast: ["oldman", "girl", "boy"],
+      isEnding: true, title: "Светлое озарение",
+      text: `Утро пришло не как дедлайн. Как приглашение.
+Он не стал другим человеком. Он стал тем же, но выспавшимся.
+Старик кивнул. Девушка наконец поймала кадр: пустая лавочка и свет.
+Мальчик сказал: «Завтра». И это была не отговорка.
+В понедельник он написал заявление. Во вторник — стихи. В среду — ничего.
+Это было лучшее «ничего» в его жизни.`
+    },
+    {
+      id: "end_dark", day: 4, background: "night", speaker: "Рассказчик", cast: ["lake"],
+      isEnding: true, title: "Погасший вид",
+      text: `Он выбрал покой. Покой оказался офисом без окон.
+Усталость ушла. Вместе с ней ушли закаты, запах воды, девушка с камерой, мальчик с корабликом.
+Старик ещё сидел на лавочке, но это был уже другой старик. Или другая лавочка.
+Иногда он просыпался в три ночи и не помнил, чего именно ждёт.
+Озеро помнило. Озеро всегда помнит.
+Но это уже не помогало.`
+    },
+    {
+      id: "end_paradox", day: 4, background: "fog", speaker: "Рассказчик", cast: ["oldman", "under"],
+      isEnding: true, title: "Парадокс",
+      text: `Он хотел уйти и остаться. Выключить телефон и ответить. Запустить кораблик и сказать, что он утонет.
+Озеро отражало его и не могло выбрать, кого отражать.
+— Ты сам себе противоречишь, — сказал старик.
+— Я человек.
+— Да. Это объясняет всё.
+Он остался на лавочке. Не как победитель. Как вопрос.
+И это, пожалуй, честнее многих ответов.`
+    },
+    {
+      id: "end_balance", day: 4, background: "sunset", speaker: "Рассказчик", cast: ["oldman", "girl", "boy", "lake"],
+      isEnding: true, title: "Равновесие",
+      text: `Ничего не решилось. Всё успокоилось.
+Работа осталась работой. Лавочка — лавочкой.
+Он не стал просветлённым. Но перестал быть срочным.
+Утром — кофе. Днём — код. Вечером — озеро.
+Девушка присылает кадр: он смотрит в воду, и в лице нет задачи.
+Мальчик машет с берега. Старик делает вид, что не ждал.
+Это не счастье. Это ровный свет. Тоже неплохо.`
+    },
+    {
+      id: "end_self", day: 4, background: "dawn", speaker: "Рассказчик", cast: ["oldman", "inner"],
+      isEnding: true, title: "Ты сам",
+      text: `Он не выбрал ни свет, ни покой. Он выбрал себя.
+Звучит красиво, пока не попробуешь.
+Утром он не стал другим. Просто перестал спрашивать разрешения.
+Написал заявление. Купил дешёвый корабль. Позвонил старому другу.
+Озеро ничего не сказало. Оно не обязано.
+Старик улыбнулся:
+— Наконец-то.
+— Что?
+— Ты перестал ждать бога.
+На лавочке остался человек. Просто человек. Это и есть финал.`
+    },
+    {
+      id: "end_catch", day: 4, background: "dawn", speaker: "Рассказчик", cast: ["fisher", "lake", "oldman"],
+      isEnding: true, title: "Улов",
+      text: `Он поймал то, чего не искал.
+Звезда оказалась монетой. Монета — крышкой от бутылки. Крышка — воспоминанием.
+Озеро не объяснило. Рыбак не объяснил. Старик посмотрел и сказал:
+— Ну вот. Теперь ты знаешь, что клюёт.
+— И что теперь?
+— Теперь отпускай. Или носи. Но не называй это смыслом.
+Он положил улов в карман. Там уже было место.
+Вечером он не пошёл на работу. Утром тоже. В среду поймал ещё одну звезду.
+Никто не поверил. Ему было достаточно.`
+    }
+  ];
+
+  const SCENE_BY_ID = new Map(scenes.map(function (scene) { return [scene.id, scene]; }));
+
+  /* ==========================================================
+     СОСТОЯНИЕ
+     ========================================================== */
+  const AUTO_KEY = "filosof_na_lavochke_auto_v1";
+  const SLOT_KEY = "filosof_na_lavochke_slot_v1";
+  const SAVE_PREFIX = "filosof_na_lavochke_slot_v2_";
+  const SAVE_KEYS = [SAVE_PREFIX + "1", SAVE_PREFIX + "2", SAVE_PREFIX + "3"];
+  const UNLOCK_KEY = "filosof_na_lavochke_endings_v1";
+
+  function createState() {
+    const copy = {};
+    Object.keys(characters).forEach(function (id) {
+      copy[id] = { affinity: 0, met: false };
+    });
+    return {
+      sceneId: "d1_s1",
+      day: 1,
+      characters: copy,
+      flags: {},
+      finalStance: null
+    };
+  }
+
+  let state = createState();
+  let currentScene = null;
+  let unlocked = readUnlocked();
+  let busy = false;
+  let galleryOpen = false;
+  let savesOpen = false;
+  let transitionTimer = null;
+
+  /* ==========================================================
+     DOM
+     ========================================================== */
+  const els = {
+    body: document.body,
+    dayLine: document.getElementById("dayLine"),
+    panel: document.getElementById("panel"),
+    portrait: document.getElementById("portrait"),
+    speaker: document.getElementById("speaker"),
+    speakerRole: document.getElementById("speakerRole"),
+    sceneNo: document.getElementById("sceneNo"),
+    endingHead: document.getElementById("endingHead"),
+    endingKicker: document.getElementById("endingKicker"),
+    endingTitle: document.getElementById("endingTitle"),
+    text: document.getElementById("text"),
+    cast: document.getElementById("cast"),
+    choices: document.getElementById("choices"),
+    endingFoot: document.getElementById("endingFoot"),
+    unlocked: document.getElementById("unlocked"),
+    restartEnding: document.getElementById("restartEnding"),
+    live: document.getElementById("live"),
+    toast: document.getElementById("toast"),
+    savesBtn: document.getElementById("savesBtn"),
+    saves: document.getElementById("saves"),
+    savesSub: document.getElementById("savesSub"),
+    savesList: document.getElementById("savesList"),
+    closeSaves: document.getElementById("closeSaves"),
+    restartBtn: document.getElementById("restartBtn"),
+    galleryBtn: document.getElementById("galleryBtn"),
+    gallery: document.getElementById("gallery"),
+    galleryCount: document.getElementById("galleryCount"),
+    galleryGrid: document.getElementById("galleryGrid"),
+    closeGallery: document.getElementById("closeGallery"),
+    stars: document.getElementById("stars")
+  };
+
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ==========================================================
+     ХРАНИЛИЩЕ
+     ========================================================== */
+  function readJSON(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function writeJSON(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function readUnlocked() {
+    const data = readJSON(UNLOCK_KEY);
+    if (!Array.isArray(data)) return [];
+    return data.filter(function (id) { return ENDING_IDS.indexOf(id) !== -1; });
+  }
+
+  function registerEnding(id) {
+    if (ENDING_IDS.indexOf(id) === -1) return;
+    if (unlocked.indexOf(id) !== -1) return;
+    unlocked.push(id);
+    writeJSON(UNLOCK_KEY, unlocked);
+  }
+
+  function serialize() {
+    const copy = {};
+    Object.keys(state.characters).forEach(function (id) {
+      copy[id] = {
+        affinity: state.characters[id].affinity,
+        met: state.characters[id].met
+      };
+    });
+    return {
+      v: 1,
+      sceneId: state.sceneId,
+      day: state.day,
+      characters: copy,
+      flags: Object.assign({}, state.flags),
+      finalStance: state.finalStance
+    };
+  }
+
+  function restore(data) {
+    if (!data || typeof data !== "object") return false;
+    if (typeof data.sceneId !== "string") return false;
+    if (!SCENE_BY_ID.has(data.sceneId)) return false;
+
+    const fresh = createState();
+    if (data.characters && typeof data.characters === "object") {
+      Object.keys(fresh.characters).forEach(function (id) {
+        const saved = data.characters[id];
+        if (!saved || typeof saved !== "object") return;
+        const value = Number(saved.affinity);
+        fresh.characters[id].affinity = isFinite(value) ? clamp(value, -5, 5) : 0;
+        fresh.characters[id].met = Boolean(saved.met);
+      });
+    }
+    if (data.flags && typeof data.flags === "object") {
+      fresh.flags = Object.assign({}, data.flags);
+    }
+    if (typeof data.finalStance === "string") {
+      fresh.finalStance = data.finalStance;
+    }
+    fresh.sceneId = data.sceneId;
+    fresh.day = Number(data.day) || 1;
+    state = fresh;
+    return true;
+  }
+
+  function autosave() {
+    writeJSON(AUTO_KEY, serialize());
+  }
+
+  /* ==========================================================
+     МЕХАНИКА
+     ========================================================== */
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function applyEffects(effects) {
+    if (!effects) return;
+    Object.keys(effects).forEach(function (id) {
+      const target = state.characters[id];
+      if (!target) return;
+      const delta = Number(effects[id]);
+      if (!isFinite(delta)) return;
+      target.met = true;
+      target.affinity = clamp(target.affinity + delta, -5, 5);
+    });
+  }
+
+  function warmth() {
+    return ["oldman", "girl", "boy", "suit", "lake", "under", "god"].reduce(function (sum, id) {
+      return sum + state.characters[id].affinity;
+    }, 0);
+  }
+
+  // Финал выбирается по отношениям и флагам, а не только по последнему клику.
+  function getEnding() {
+    const f = state.flags;
+    const contradictions = [
+      Boolean(f.believedGod && f.mockedGod),
+      Boolean(f.phoneThrown && f.phoneAnswered),
+      Boolean(f.boatLaunched && f.boatScoffed),
+      Boolean(f.suitForgiven && f.suitRefused),
+      Boolean(f.dealAccepted && f.dealRefused)
+    ].filter(Boolean).length;
+
+    if (contradictions >= 2) return "end_paradox";
+
+    const w = warmth();
+    const inner = state.characters.inner.affinity;
+
+    if (state.finalStance === "self") {
+      return inner >= 2 ? "end_self" : "end_paradox";
+    }
+    if (state.finalStance === "light") {
+      if (w >= 8 && inner >= 2) return "end_light";
+      if (w >= 2) return "end_balance";
+      return "end_dark";
+    }
+    if (state.finalStance === "dark") {
+      return "end_dark";
+    }
+    if (state.finalStance === "balance") {
+      if (f.caughtStar) return "end_catch";
+      return "end_balance";
+    }
+    return "end_balance";
+  }
+
+  /* ==========================================================
+     ПЕРЕХОДЫ
+     ========================================================== */
+  function goToScene(id) {
+    const scene = SCENE_BY_ID.get(id);
+    if (!scene) {
+      showBroken();
+      return;
+    }
+
+    busy = true;
+    cancelTyping();
+    els.panel.classList.add("is-leaving");
+    clearTimeout(transitionTimer);
+
+    transitionTimer = setTimeout(function () {
+      state.sceneId = scene.id;
+      state.day = scene.day || state.day;
+      if (scene.isEnding) registerEnding(scene.id);
+      renderScene(scene);
+      autosave();
+
+      requestAnimationFrame(function () {
+        els.panel.classList.remove("is-leaving");
+        setTimeout(function () { busy = false; }, 260);
+      });
+    }, 200);
+  }
+
+  function selectChoice(choice) {
+    if (busy) return;
+    busy = true;
+
+    applyEffects(choice.effects);
+    if (choice.flags && typeof choice.flags === "object") {
+      Object.assign(state.flags, choice.flags);
+    }
+
+    if (choice.final) {
+      state.finalStance = choice.stance || "balance";
+      const endingId = getEnding();
+      busy = false;
+      goToScene(endingId);
+      return;
+    }
+
+    if (choice.next) {
+      busy = false;
+      goToScene(choice.next);
+    } else {
+      busy = false;
+      goToScene(getEnding());
+    }
+  }
+
+  /* ==========================================================
+     РЕНДЕР
+     ========================================================== */
+  function findCharacterId(speaker) {
+    const keys = Object.keys(characters);
+    for (let i = 0; i < keys.length; i += 1) {
+      if (characters[keys[i]].name === speaker) return keys[i];
+    }
+    return "narrator";
+  }
+
+  function portraitMarkup(id) {
+    return '<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><use href="#p-' + id + '"></use></svg>';
+  }
+
+  function renderPortrait(speaker) {
+    const id = findCharacterId(speaker);
+    els.portrait.innerHTML = portraitMarkup(id);
+    els.speakerRole.textContent = characters[id] ? characters[id].role : "голос за кадром";
+  }
+
+  function renderScene(scene) {
+    currentScene = scene;
+
+    els.body.dataset.scene = scene.id;
+    els.body.dataset.bg = scene.background || "fog";
+    els.body.classList.toggle("rod-out", Boolean(scene.rod));
+    els.dayLine.textContent = "День " + (scene.day || state.day) + " · " + (BG_LABEL[scene.background] || "Туман");
+    els.speaker.textContent = scene.speaker || "Рассказчик";
+    els.sceneNo.textContent = scene.isEnding ? "Финал" : "";
+    renderPortrait(scene.speaker || "Рассказчик");
+
+    renderCast(scene.cast || []);
+
+    els.endingHead.hidden = !scene.isEnding;
+    els.endingKicker.textContent = scene.broken ? "Конец" : "Финал";
+    els.endingTitle.textContent = scene.title || "";
+    els.endingFoot.hidden = true;
+    els.choices.innerHTML = "";
+    els.choices.classList.add("is-hidden");
+
+    if (!scene.isEnding) {
+      renderChoices(scene, true);
+    }
+
+    typeText(scene.text, function () {
+      if (scene.isEnding) {
+        els.endingFoot.hidden = false;
+        els.unlocked.textContent = scene.broken
+          ? "Сцена не нашлась. Но озеро на месте."
+          : "Открыто финалов: " + unlocked.length + " из " + ENDING_IDS.length;
+        els.live.textContent = "Финал. " + (scene.title || "Конец") + ". " + scene.text;
+      } else {
+        els.choices.classList.remove("is-hidden");
+        els.live.textContent = (scene.speaker || "Рассказчик") + ". " + scene.text;
+      }
+    });
+  }
+
+  function renderCast(ids) {
+    els.cast.innerHTML = "";
+    if (!ids || !ids.length) {
+      els.cast.hidden = true;
+      return;
+    }
+    els.cast.hidden = false;
+
+    ids.forEach(function (id) {
+      const meta = characters[id];
+      const data = state.characters[id];
+      if (!meta || !data) return;
+      data.met = true;
+
+      const chip = document.createElement("span");
+      chip.className = "chip";
+
+      const avatar = document.createElement("span");
+      avatar.className = "chip-avatar";
+      avatar.innerHTML = portraitMarkup(id);
+      chip.appendChild(avatar);
+
+      const who = document.createElement("span");
+      who.className = "who";
+      who.textContent = meta.name;
+      chip.appendChild(who);
+
+      const pips = document.createElement("span");
+      pips.className = "pips";
+      const filled = Math.min(5, Math.abs(data.affinity));
+      for (let i = 0; i < 5; i += 1) {
+        const pip = document.createElement("i");
+        pip.className = "pip";
+        if (i < filled) {
+          pip.classList.add("on");
+          if (data.affinity < 0) pip.classList.add("neg");
+        }
+        pips.appendChild(pip);
+      }
+      chip.appendChild(pips);
+
+      const signed = (data.affinity > 0 ? "+" : "") + data.affinity;
+      chip.title = meta.name + ": " + signed;
+      chip.setAttribute("aria-label", meta.name + ", отношение " + signed);
+      els.cast.appendChild(chip);
+    });
+  }
+
+  function renderChoices(scene, hidden) {
+    els.choices.innerHTML = "";
+
+    const list = (scene.choices || []).filter(function (choice) {
+      if (typeof choice.when === "function") {
+        try {
+          return Boolean(choice.when(state));
+        } catch (err) {
+          return true;
+        }
+      }
+      return true;
+    });
+
+    list.forEach(function (choice, index) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice" + (choice.final ? " is-final" : "");
+
+      const num = document.createElement("span");
+      num.className = "num";
+      num.textContent = String(index + 1);
+
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = choice.text;
+
+      btn.appendChild(num);
+      btn.appendChild(label);
+      btn.addEventListener("click", function () {
+        selectChoice(choice);
+      });
+
+      els.choices.appendChild(btn);
+    });
+
+    if (hidden) {
+      els.choices.classList.add("is-hidden");
+    } else {
+      els.choices.classList.remove("is-hidden");
+    }
+  }
+
+  /* ==========================================================
+     ГАЛЕРЕЯ ПЕРСОНАЖЕЙ
+     ========================================================== */
+  function buildPips(affinity) {
+    const pips = document.createElement("span");
+    pips.className = "pips";
+    const filled = Math.min(5, Math.abs(affinity));
+    for (let i = 0; i < 5; i += 1) {
+      const pip = document.createElement("i");
+      pip.className = "pip";
+      if (i < filled) {
+        pip.classList.add("on");
+        if (affinity < 0) pip.classList.add("neg");
+      }
+      pips.appendChild(pip);
+    }
+    return pips;
+  }
+
+  function renderGallery() {
+    els.galleryGrid.innerHTML = "";
+    const ids = Object.keys(characters);
+    let metCount = 0;
+
+    ids.forEach(function (id) {
+      const meta = characters[id];
+      const data = state.characters[id];
+      const met = Boolean(data.met);
+      if (met) metCount += 1;
+
+      const card = document.createElement("article");
+      card.className = "person-card" + (met ? "" : " is-locked");
+
+      const portrait = document.createElement("div");
+      portrait.className = "person-portrait";
+      portrait.innerHTML = portraitMarkup(id);
+      card.appendChild(portrait);
+
+      const copy = document.createElement("div");
+      copy.className = "person-copy";
+
+      const name = document.createElement("h3");
+      name.className = "person-name";
+      name.textContent = met ? meta.name : "???";
+      copy.appendChild(name);
+
+      const role = document.createElement("p");
+      role.className = "person-role";
+      role.textContent = met ? meta.role : "Вы ещё не встретились.";
+      copy.appendChild(role);
+
+      if (met) {
+        const pips = buildPips(data.affinity);
+        const signed = (data.affinity > 0 ? "+" : "") + data.affinity;
+        pips.title = "Отношение: " + signed;
+        copy.appendChild(pips);
+      }
+
+      card.appendChild(copy);
+      els.galleryGrid.appendChild(card);
+    });
+
+    els.galleryCount.textContent = "Знакомы: " + metCount + " из " + ids.length +
+      " · финалов открыто: " + unlocked.length + " из " + ENDING_IDS.length;
+  }
+
+  function openGallery() {
+    if (galleryOpen) return;
+    if (savesOpen) closeSaves();
+    galleryOpen = true;
+    renderGallery();
+    els.gallery.hidden = false;
+    els.galleryBtn.classList.add("is-active");
+    els.closeGallery.focus();
+  }
+
+  function closeGallery() {
+    if (!galleryOpen) return;
+    galleryOpen = false;
+    els.gallery.hidden = true;
+    els.galleryBtn.classList.remove("is-active");
+    els.galleryBtn.focus();
+  }
+
+  /* ==========================================================
+     ПЕЧАТЬ ТЕКСТА
+     ========================================================== */
+  let typingTimer = null;
+  let typingDone = null;
+  let isTyping = false;
+
+  function typeText(text, onDone) {
+    cancelTyping();
+    isTyping = true;
+    typingDone = onDone;
+    els.text.textContent = "";
+    els.text.classList.add("is-typing");
+
+    if (reduceMotion || !text) {
+      endTyping();
+      return;
+    }
+
+    let index = 0;
+    typingTimer = setInterval(function () {
+      index = Math.min(text.length, index + 2);
+      els.text.textContent = text.slice(0, index);
+      if (index >= text.length) endTyping();
+    }, 17);
+  }
+
+  function endTyping() {
+    if (!isTyping) return;
+    clearInterval(typingTimer);
+    typingTimer = null;
+    isTyping = false;
+    els.text.classList.remove("is-typing");
+    if (currentScene) els.text.textContent = currentScene.text;
+
+    const callback = typingDone;
+    typingDone = null;
+    if (callback) callback();
+  }
+
+  function cancelTyping() {
+    clearInterval(typingTimer);
+    typingTimer = null;
+    isTyping = false;
+    typingDone = null;
+    els.text.classList.remove("is-typing");
+  }
+
+  /* ==========================================================
+     ОШИБКИ И СЛУЖЕБНЫЕ ЭКРАНЫ
+     ========================================================== */
+  function showBroken() {
+    cancelTyping();
+    busy = false;
+    state.sceneId = "__broken";
+    const broken = {
+      id: "__broken",
+      day: state.day || 1,
+      background: "fog",
+      speaker: "Рассказчик",
+      cast: [],
+      isEnding: true,
+      broken: true,
+      title: "Конец",
+      text: `Сцена потерялась в тумане. Так бывает даже в историях.
+Озеро осталось. Лавочка осталась. Даже этот вечер остался.
+Можно начать заново. Озеро не против.`
+    };
+    currentScene = broken;
+    els.body.dataset.bg = "fog";
+    els.body.classList.remove("rod-out");
+    els.dayLine.textContent = "День ? · Туман";
+    els.speaker.textContent = "Рассказчик";
+    els.speakerRole.textContent = "голос за кадром";
+    els.portrait.innerHTML = portraitMarkup("narrator");
+    els.sceneNo.textContent = "Конец";
+    renderCast([]);
+    els.endingHead.hidden = false;
+    els.endingKicker.textContent = "Конец";
+    els.endingTitle.textContent = "Конец";
+    els.choices.innerHTML = "";
+    els.choices.classList.add("is-hidden");
+    els.endingFoot.hidden = false;
+    els.unlocked.textContent = "Сцена не нашлась. Но озеро на месте.";
+    typeText(broken.text, function () {
+      els.live.textContent = broken.text;
+    });
+  }
+
+  function showToast(message) {
+    els.toast.textContent = message;
+    els.toast.classList.add("is-visible");
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(function () {
+      els.toast.classList.remove("is-visible");
+    }, 2400);
+  }
+
+  /* ==========================================================
+     СОХРАНЕНИЯ / ЗАГРУЗКА / СБРОС
+     ========================================================== */
+  let armedDelete = -1;
+  let deleteTimer = null;
+
+  function slotPayload(index) {
+    const raw = readJSON(SAVE_KEYS[index]);
+    if (!raw || typeof raw !== "object") return null;
+    if (raw.data && typeof raw.data === "object" && typeof raw.data.sceneId === "string") {
+      return { savedAt: raw.savedAt || null, data: raw.data };
+    }
+    // Совместимость со старым одиночным слотом.
+    if (typeof raw.sceneId === "string") {
+      return { savedAt: null, data: raw };
+    }
+    return null;
+  }
+
+  function describeData(data) {
+    const scene = data && SCENE_BY_ID.get(data.sceneId);
+    const day = (data && data.day) || (scene ? scene.day : 1);
+    const bg = scene && scene.background ? (BG_LABEL[scene.background] || "Туман") : "Туман";
+    const title = scene
+      ? (scene.isEnding ? scene.title : (scene.speaker || "Рассказчик"))
+      : "Сцена";
+    const snippet = scene ? scene.text.replace(/\s+/g, " ").slice(0, 92) + "…" : "";
+    return {
+      day: day,
+      bg: bg,
+      title: title,
+      snippet: snippet,
+      ending: Boolean(scene && scene.isEnding)
+    };
+  }
+
+  function formatSavedAt(iso) {
+    if (!iso) return "ранее";
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return "ранее";
+    try {
+      return date.toLocaleString("ru-RU", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    } catch (err) {
+      return "ранее";
+    }
+  }
+
+  function migrateLegacySlot() {
+    if (readJSON(SAVE_KEYS[0])) return;
+    const legacy = readJSON(SLOT_KEY);
+    if (legacy && typeof legacy.sceneId === "string" && SCENE_BY_ID.has(legacy.sceneId)) {
+      if (writeJSON(SAVE_KEYS[0], { v: 2, savedAt: null, data: legacy })) {
+        try {
+          localStorage.removeItem(SLOT_KEY);
+        } catch (err) {
+          // Старый слот просто останется лежать, игра его больше не читает.
+        }
+      }
+    }
+  }
+
+  function saveToSlot(index) {
+    if (!SCENE_BY_ID.has(state.sceneId)) {
+      showToast("Сейчас сохранять нечего. Озеро разводит руками.");
+      return;
+    }
+    const payload = {
+      v: 2,
+      savedAt: new Date().toISOString(),
+      data: serialize()
+    };
+    armedDelete = -1;
+    if (writeJSON(SAVE_KEYS[index], payload)) {
+      renderSaves();
+      showToast("Сохранено в слот " + (index + 1) + ".");
+    } else {
+      showToast("Браузер не разрешил сохранить.");
+    }
+  }
+
+  function loadFromSlot(index) {
+    const slot = slotPayload(index);
+    if (!slot || !restore(slot.data)) {
+      showToast("Этот слот пуст. Как озеро зимой.");
+      return;
+    }
+    clearTimeout(transitionTimer);
+    busy = false;
+    closeSaves();
+    showToast("Загружено из слота " + (index + 1) + ".");
+    goToScene(state.sceneId);
+  }
+
+  function requestDeleteSlot(index) {
+    if (armedDelete !== index) {
+      armedDelete = index;
+      renderSaves();
+      clearTimeout(deleteTimer);
+      deleteTimer = setTimeout(function () {
+        armedDelete = -1;
+        if (savesOpen) renderSaves();
+      }, 2600);
+      return;
+    }
+    try {
+      localStorage.removeItem(SAVE_KEYS[index]);
+    } catch (err) {
+      // Ничего страшного: просто не удалилось.
+    }
+    armedDelete = -1;
+    renderSaves();
+    showToast("Слот " + (index + 1) + " очищен.");
+  }
+
+  function renderSaves() {
+    if (!els.savesList) return;
+    const current = describeData(serialize());
+    els.savesSub.textContent = "Сейчас: День " + current.day + " · " + current.bg +
+      ", " + current.title + ". Автосохранение идёт само.";
+    els.savesList.innerHTML = "";
+
+    SAVE_KEYS.forEach(function (key, index) {
+      const slot = slotPayload(index);
+      const card = document.createElement("article");
+      card.className = "save-card" + (slot ? "" : " is-empty");
+
+      const top = document.createElement("div");
+      top.className = "save-top";
+      const slotName = document.createElement("span");
+      slotName.className = "save-slot";
+      slotName.textContent = "Слот " + (index + 1);
+      const time = document.createElement("span");
+      time.className = "save-time";
+      time.textContent = slot ? formatSavedAt(slot.savedAt) : "пусто";
+      top.appendChild(slotName);
+      top.appendChild(time);
+      card.appendChild(top);
+
+      const title = document.createElement("h3");
+      title.className = "save-scene";
+      const meta = document.createElement("div");
+      meta.className = "save-meta";
+
+      let snippetText = "";
+      if (slot) {
+        const info = describeData(slot.data);
+        title.textContent = (info.ending ? "Финал: " : "") + info.title;
+        meta.textContent = "День " + info.day + " · " + info.bg;
+        snippetText = info.snippet;
+      } else {
+        title.textContent = "Пока ничего";
+        meta.textContent = "Озеро не хранит чужие сны. Сохраните этот момент.";
+      }
+      card.appendChild(title);
+      card.appendChild(meta);
+      if (snippetText) {
+        const snippet = document.createElement("p");
+        snippet.className = "save-snippet";
+        snippet.textContent = snippetText;
+        card.appendChild(snippet);
+      }
+
+      const actions = document.createElement("div");
+      actions.className = "save-actions";
+
+      const saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.className = "primary small";
+      saveBtn.textContent = slot ? "Перезаписать" : "Сохранить";
+      saveBtn.addEventListener("click", function () {
+        saveToSlot(index);
+      });
+      actions.appendChild(saveBtn);
+
+      if (slot) {
+        const loadBtn = document.createElement("button");
+        loadBtn.type = "button";
+        loadBtn.className = "ghost small";
+        loadBtn.textContent = "Загрузить";
+        loadBtn.addEventListener("click", function () {
+          loadFromSlot(index);
+        });
+        actions.appendChild(loadBtn);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "ghost small danger";
+        deleteBtn.textContent = armedDelete === index ? "Точно?" : "Удалить";
+        deleteBtn.addEventListener("click", function () {
+          requestDeleteSlot(index);
+        });
+        actions.appendChild(deleteBtn);
+      }
+
+      card.appendChild(actions);
+      els.savesList.appendChild(card);
+    });
+  }
+
+  function openSaves() {
+    if (savesOpen) return;
+    if (galleryOpen) closeGallery();
+    savesOpen = true;
+    armedDelete = -1;
+    renderSaves();
+    els.saves.hidden = false;
+    els.savesBtn.classList.add("is-active");
+    els.closeSaves.focus();
+  }
+
+  function closeSaves() {
+    if (!savesOpen) return;
+    savesOpen = false;
+    armedDelete = -1;
+    clearTimeout(deleteTimer);
+    els.saves.hidden = true;
+    els.savesBtn.classList.remove("is-active");
+    els.savesBtn.focus();
+  }
+
+  function resetGame() {
+    cancelTyping();
+    clearTimeout(transitionTimer);
+    busy = false;
+    state = createState();
+    try {
+      localStorage.removeItem(AUTO_KEY);
+    } catch (err) {
+      // Хранилище может быть недоступно — игра продолжится без автосохранения.
+    }
+    disarmRestart();
+    showToast("Новая история. Озеро делает вид, что не узнаёт.");
+    goToScene("d1_s1");
+  }
+
+  /* ==========================================================
+     КНОПКИ
+     ========================================================== */
+  let restartTimer = null;
+
+  function disarmRestart() {
+    els.restartBtn.textContent = "Заново";
+    els.restartBtn.classList.remove("is-armed");
+    els.restartBtn.dataset.armed = "0";
+  }
+
+  els.restartBtn.addEventListener("click", function () {
+    if (els.restartBtn.dataset.armed === "1") {
+      clearTimeout(restartTimer);
+      resetGame();
+      return;
+    }
+    els.restartBtn.dataset.armed = "1";
+    els.restartBtn.textContent = "Точно?";
+    els.restartBtn.classList.add("is-armed");
+    clearTimeout(restartTimer);
+    restartTimer = setTimeout(disarmRestart, 2600);
+  });
+
+  els.restartEnding.addEventListener("click", resetGame);
+  els.galleryBtn.addEventListener("click", openGallery);
+  els.closeGallery.addEventListener("click", closeGallery);
+  els.gallery.querySelector("[data-close-gallery]").addEventListener("click", closeGallery);
+  els.savesBtn.addEventListener("click", openSaves);
+  els.closeSaves.addEventListener("click", closeSaves);
+  els.saves.querySelector("[data-close-saves]").addEventListener("click", closeSaves);
+
+  /* ==========================================================
+     ВВОД
+     ========================================================== */
+  els.panel.addEventListener("click", function (event) {
+    if (event.target.closest("button")) return;
+    if (isTyping) endTyping();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (savesOpen) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeSaves();
+      }
+      return;
+    }
+    if (galleryOpen) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeGallery();
+      }
+      return;
+    }
+    if (event.key === "Escape") return;
+    if (isTyping && (event.key === " " || event.key === "Enter")) {
+      event.preventDefault();
+      endTyping();
+      return;
+    }
+    if (isTyping) return;
+    if (!els.choices.classList.contains("is-hidden")) {
+      const number = parseInt(event.key, 10);
+      if (number >= 1 && number <= 4) {
+        const buttons = els.choices.querySelectorAll(".choice");
+        if (buttons[number - 1]) {
+          event.preventDefault();
+          buttons[number - 1].click();
+        }
+      }
+    }
+  });
+
+  /* ==========================================================
+     ЗВЁЗДЫ
+     ========================================================== */
+  function buildStars() {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < 90; i += 1) {
+      const star = document.createElement("span");
+      star.className = "star";
+      star.style.left = (Math.random() * 100).toFixed(2) + "%";
+      star.style.top = (Math.random() * 66).toFixed(2) + "%";
+      star.style.setProperty("--dur", (2 + Math.random() * 4).toFixed(2) + "s");
+      star.style.setProperty("--delay", (-Math.random() * 6).toFixed(2) + "s");
+      const size = Math.random() < 0.14 ? "2.6px" : "1.6px";
+      star.style.width = size;
+      star.style.height = size;
+      fragment.appendChild(star);
+    }
+    els.stars.appendChild(fragment);
+  }
+
+  /* ==========================================================
+     СТАРТ
+     ========================================================== */
+  function boot() {
+    buildStars();
+    migrateLegacySlot();
+
+    const auto = readJSON(AUTO_KEY);
+    if (auto && restore(auto)) {
+      showToast("Продолжаем. Озеро не забыло.");
+      goToScene(state.sceneId);
+    } else {
+      state = createState();
+      showToast("Клик по тексту — дочитать сразу. Выбор — внизу.");
+      goToScene("d1_s1");
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
